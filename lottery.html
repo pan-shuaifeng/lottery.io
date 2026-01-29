@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2026 新春年会抽奖</title>
-    <script src="assets/tailwind.min.js"></script>
+    <link rel="stylesheet" href="assets/layui.css">
     <script>
-        // 确保 tailwind 加载成功后的配置
-        window.tailwind && (tailwind.config = {
+        // 在 tailwind 脚本加载前定义配置，这是 Tailwind Play CDN 的推荐做法
+        window.tailwind = {
             theme: {
                 extend: {
                     colors: {
@@ -17,8 +17,9 @@
                     }
                 }
             }
-        });
+        }
     </script>
+    <script src="assets/tailwind.min.js"></script>
     <script src="assets/confetti.browser.min.js"></script>
     <!-- 使用更可靠的字体镜像 -->
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@700;900&display=swap" rel="stylesheet">
