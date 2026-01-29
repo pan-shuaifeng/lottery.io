@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2026 新春年会抽奖</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="assets/tailwind.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -18,7 +18,7 @@
             }
         }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="assets/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -32,8 +32,9 @@
             background: radial-gradient(circle at center, var(--new-year-red) 0%, var(--deep-red) 100%);
             color: var(--gold);
             font-family: 'Noto Serif SC', serif;
-            overflow: hidden;
-            height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+            min-height: 100vh;
             margin: 0;
             position: relative;
         }
@@ -98,14 +99,24 @@
 
         /* 名字滚动区域 */
         .name-display {
-            height: 200px;
+            height: 160px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 8rem;
+            font-size: 4rem;
             text-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 215, 0, 0.4);
             transition: all 0.1s;
-            letter-spacing: 0.5rem;
+            letter-spacing: 0.2rem;
+            word-break: break-all;
+            text-align: center;
+        }
+
+        @media (min-width: 640px) {
+            .name-display {
+                height: 200px;
+                font-size: 8rem;
+                letter-spacing: 0.5rem;
+            }
         }
 
         .rolling {
@@ -125,10 +136,11 @@
             transition: all 0.3s;
             border: 2px solid #fff;
             text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+            white-space: nowrap;
         }
 
         .btn-gold:hover {
-            transform: scale(1.1);
+            transform: scale(1.05);
             box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
         }
 
@@ -136,18 +148,52 @@
             transform: scale(0.95);
         }
 
-        /* 边框装饰 */
+        /* 边框装饰 - 移动端缩小或隐藏 */
         .corner-decoration {
             position: fixed;
-            width: 200px;
-            height: 200px;
+            width: 50px;
+            height: 50px;
             pointer-events: none;
+            z-index: 5;
         }
 
-        .top-left { top: 0; left: 0; border-top: 10px solid var(--gold); border-left: 10px solid var(--gold); }
-        .top-right { top: 0; right: 0; border-top: 10px solid var(--gold); border-right: 10px solid var(--gold); }
-        .bottom-left { bottom: 0; left: 0; border-bottom: 10px solid var(--gold); border-left: 10px solid var(--gold); }
-        .bottom-right { bottom: 0; right: 0; border-bottom: 10px solid var(--gold); border-right: 10px solid var(--gold); }
+        @media (min-width: 640px) {
+            .corner-decoration {
+                width: 150px;
+                height: 150px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .corner-decoration {
+                width: 200px;
+                height: 200px;
+            }
+        }
+
+        .top-left { top: 0; left: 0; border-top: 5px solid var(--gold); border-left: 5px solid var(--gold); }
+        .top-right { top: 0; right: 0; border-top: 5px solid var(--gold); border-right: 5px solid var(--gold); }
+        .bottom-left { bottom: 0; left: 0; border-bottom: 5px solid var(--gold); border-left: 5px solid var(--gold); }
+        .bottom-right { bottom: 0; right: 0; border-bottom: 5px solid var(--gold); border-right: 5px solid var(--gold); }
+
+        @media (min-width: 640px) {
+            .top-left { border-top-width: 10px; border-left-width: 10px; }
+            .top-right { border-top-width: 10px; border-right-width: 10px; }
+            .bottom-left { border-bottom-width: 10px; border-left-width: 10px; }
+            .bottom-right { border-bottom-width: 10px; border-right-width: 10px; }
+        }
+
+        /* 灯笼在小屏上缩小 */
+        @media (max-width: 640px) {
+            .lantern {
+                width: 60px;
+                height: 80px;
+            }
+            .lantern::after {
+                bottom: -20px;
+                height: 20px;
+            }
+        }
 
         /* 中奖样式 */
         .winner-text {
@@ -184,36 +230,43 @@
     <div class="corner-decoration bottom-left"></div>
     <div class="corner-decoration bottom-right"></div>
 
-    <div class="flex flex-col items-center justify-center h-full py-8 relative">
-        <header class="text-center mb-12">
-            <h1 class="title-font text-8xl mb-4 text-white drop-shadow-[0_5px_15px_rgba(255,215,0,0.3)]">2026 辞旧迎新</h1>
-            <h2 class="text-4xl tracking-[1rem] text-gold opacity-90">公司年会盛典·幸运大抽奖</h2>
+    <div class="flex flex-col items-center justify-center min-h-screen py-8 px-4 relative">
+        <header class="text-center mb-8 md:mb-12">
+            <h1 class="title-font text-5xl sm:text-7xl md:text-8xl mb-4 text-white drop-shadow-[0_5px_15px_rgba(255,215,0,0.3)]">2026 辞旧迎新</h1>
+            <h2 class="text-xl sm:text-3xl md:text-4xl tracking-[0.5rem] md:tracking-[1rem] text-gold opacity-90">公司年会盛典·幸运大抽奖</h2>
         </header>
 
-        <main class="w-full max-w-4xl px-8 relative">
+        <main class="w-full max-w-4xl px-4 md:px-8 relative">
             <!-- 居中抽奖区 -->
-            <div class="bg-red-900/40 backdrop-blur-2xl rounded-[3rem] p-16 border-4 border-gold/50 shadow-[0_0_60px_rgba(139,0,0,0.5)] relative overflow-hidden">
+            <div class="bg-red-900/40 backdrop-blur-2xl rounded-[2rem] md:rounded-[3rem] p-8 md:p-16 border-4 border-gold/50 shadow-[0_0_60px_rgba(139,0,0,0.5)] relative overflow-hidden">
                 <!-- 内部装饰线 -->
-                <div class="absolute inset-4 border border-gold/20 rounded-[2.5rem] pointer-events-none"></div>
+                <div class="absolute inset-4 border border-gold/20 rounded-[1.5rem] md:rounded-[2.5rem] pointer-events-none"></div>
                 
                 <div id="name-box" class="name-display text-white">
                     等待开启
                 </div>
                 
-                <div class="flex justify-center mt-16 space-x-10">
-                    <button id="start-btn" class="btn-gold px-16 py-5 rounded-full text-3xl font-extrabold">
+                <div class="flex flex-col sm:flex-row justify-center mt-8 md:mt-16 space-y-4 sm:space-y-0 sm:space-x-10">
+                    <button id="start-btn" class="btn-gold px-12 md:px-16 py-4 md:py-5 rounded-full text-2xl md:text-3xl font-extrabold">
                         开始抽奖
                     </button>
-                    <button id="stop-btn" class="btn-gold px-16 py-5 rounded-full text-3xl font-extrabold hidden">
+                    <button id="stop-btn" class="btn-gold px-12 md:px-16 py-4 md:py-5 rounded-full text-2xl md:text-3xl font-extrabold hidden">
                         停止
                     </button>
                 </div>
             </div>
         </main>
 
-        <!-- 侧边中奖记录 (右侧悬浮) -->
-        <aside class="fixed right-8 top-1/2 -translate-y-1/2 w-80 bg-red-700/40 backdrop-blur-xl rounded-3xl p-6 border-2 border-gold/40 shadow-2xl z-20 flex flex-col h-[600px]">
-            <h3 class="title-font text-3xl text-center mb-6 text-gold border-b-2 border-gold/30 pb-4">🏆 中奖名单</h3>
+        <!-- 侧边中奖记录 (右侧悬浮/移动端底部抽屉) -->
+        <button onclick="toggleWinners()" class="fixed right-4 bottom-24 lg:hidden z-30 bg-gold text-red-900 p-3 rounded-full shadow-lg font-bold">
+            🏆 记录
+        </button>
+
+        <aside id="winner-aside" class="fixed right-0 bottom-0 w-full h-[70vh] lg:h-[600px] lg:w-80 lg:right-8 lg:top-1/2 lg:-translate-y-1/2 bg-red-700/90 lg:bg-red-700/40 backdrop-blur-xl rounded-t-3xl lg:rounded-3xl p-6 border-t-4 lg:border-2 border-gold/40 shadow-2xl z-40 flex flex-col transition-transform transform translate-y-full lg:translate-y-[-50%]">
+            <div class="flex justify-between items-center mb-6 border-b-2 border-gold/30 pb-4">
+                <h3 class="title-font text-2xl md:text-3xl text-gold">🏆 中奖名单</h3>
+                <button onclick="toggleWinners()" class="lg:hidden text-gold text-2xl">&times;</button>
+            </div>
             <div id="main-winner-list" class="history-list flex-1 overflow-y-auto space-y-4 pr-2">
                 <!-- 记录将在这里动态生成 -->
             </div>
@@ -222,14 +275,14 @@
             </div>
         </aside>
 
-        <footer class="mt-12 flex gap-10">
-            <button onclick="toggleSettings()" class="text-xl text-gold/80 underline hover:text-gold transition-colors font-bold">配置名单</button>
-            <button onclick="resetWinners()" class="text-xl text-red-100/80 underline hover:text-red-50 transition-colors font-bold">重置抽奖</button>
+        <footer class="mt-12 flex flex-wrap justify-center gap-6 md:gap-10">
+            <button onclick="toggleSettings()" class="text-lg md:text-xl text-gold/80 underline hover:text-gold transition-colors font-bold">配置名单</button>
+            <button onclick="resetWinners()" class="text-lg md:text-xl text-red-100/80 underline hover:text-red-50 transition-colors font-bold">重置抽奖</button>
         </footer>
     </div>
 
     <!-- 隐藏的设置面板 -->
-    <div id="settings-panel" class="fixed right-0 top-0 h-full w-96 bg-red-700 p-8 transform translate-x-full transition-transform z-50 border-l-4 border-gold/50 shadow-[-20px_0_60px_rgba(0,0,0,0.7)] flex flex-col">
+    <div id="settings-panel" class="fixed right-0 top-0 h-full w-full sm:w-96 bg-red-700 p-6 md:p-8 transform translate-x-full transition-transform z-50 border-l-4 border-gold/50 shadow-[-20px_0_60px_rgba(0,0,0,0.7)] flex flex-col">
         <h3 class="title-font text-3xl mb-6 text-gold shrink-0">抽奖名单管理</h3>
         <textarea id="name-input" class="w-full flex-1 bg-red-900/50 text-white p-4 rounded-2xl border-2 border-gold/30 focus:border-gold/60 outline-none mb-6 text-xl" placeholder="请输入名单，每行一个名字"></textarea>
         <div class="space-y-4 shrink-0">
@@ -294,6 +347,17 @@
             localStorage.setItem('lottery_master_candidates', JSON.stringify(masterCandidates));
             localStorage.setItem('lottery_candidates', JSON.stringify(candidates));
             localStorage.setItem('lottery_winners', JSON.stringify(winners));
+        }
+
+        // 切换中奖记录面板 (移动端)
+        function toggleWinners() {
+            const aside = document.getElementById('winner-aside');
+            if (aside) {
+                // 在小屏幕上切换 translate-y-full，在大屏幕上保持原有位置
+                if (window.innerWidth < 1024) {
+                    aside.classList.toggle('translate-y-full');
+                }
+            }
         }
 
         // 切换设置面板
