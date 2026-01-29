@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 新春年会抽奖</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: '#ffd700',
+                        'new-year-red': '#d42b3d',
+                        'deep-red': '#8b0000',
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --new-year-red: #d42b3d;
+            --deep-red: #8b0000;
+            --gold: #ffd700;
+            --gold-light: #ffae00;
+        }
+
+        body {
+            background: radial-gradient(circle at center, var(--new-year-red) 0%, var(--deep-red) 100%);
+            color: var(--gold);
+            font-family: 'Noto Serif SC', serif;
+            overflow: hidden;
+            height: 100vh;
+            margin: 0;
+            position: relative;
+        }
+
+        /* 预定义一些关键类，防止 Tailwind 加载前的黑色闪烁 */
+        .bg-gold { background-color: var(--gold) !important; }
+        .text-gold { color: var(--gold) !important; }
+        .bg-red-700 { background-color: #b91c1c !important; }
+        .bg-red-800 { background-color: #991b1b !important; }
+        .bg-red-900 { background-color: #7f1d1d !important; }
+        .bg-red-950 { background-color: #450a0a !important; }
+
+        /* 背景装饰点缀 */
+        body::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(var(--gold) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.15;
+            animation: moveBg 20s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes moveBg {
+            from { background-position: 0 0; }
+            to { background-position: 500px 500px; }
+        }
+
+        .title-font {
+            font-family: 'Ma Shan Zheng', cursive;
+        }
+
+        /* 灯笼动画 */
+        .lantern {
+            position: absolute;
+            top: -20px;
+            width: 100px;
+            height: 120px;
+            background: #ff3333;
+            border-radius: 50% 50% 45% 45%;
+            box-shadow: 0 0 40px rgba(255, 50, 50, 0.6);
+            animation: swing 3s ease-in-out infinite alternate;
+            transform-origin: top center;
+            z-index: 10;
+        }
+
+        .lantern::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            width: 2px;
+            height: 30px;
+            background: var(--gold);
+        }
+
+        @keyframes swing {
+            from { transform: rotate(-5deg); }
+            to { transform: rotate(5deg); }
+        }
+
+        /* 名字滚动区域 */
+        .name-display {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8rem;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 215, 0, 0.4);
+            transition: all 0.1s;
+            letter-spacing: 0.5rem;
+        }
+
+        .rolling {
+            animation: blur 0.1s infinite alternate;
+        }
+
+        @keyframes blur {
+            from { filter: blur(2px); transform: scale(1); }
+            to { filter: blur(5px); transform: scale(1.05); }
+        }
+
+        /* 按钮样式 */
+        .btn-gold {
+            background: linear-gradient(135deg, #ffd700 0%, #ffae00 100%);
+            color: #800000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+            border: 2px solid #fff;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+        }
+
+        .btn-gold:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .btn-gold:active {
+            transform: scale(0.95);
+        }
+
+        /* 边框装饰 */
+        .corner-decoration {
+            position: fixed;
+            width: 200px;
+            height: 200px;
+            pointer-events: none;
+        }
+
+        .top-left { top: 0; left: 0; border-top: 10px solid var(--gold); border-left: 10px solid var(--gold); }
+        .top-right { top: 0; right: 0; border-top: 10px solid var(--gold); border-right: 10px solid var(--gold); }
+        .bottom-left { bottom: 0; left: 0; border-bottom: 10px solid var(--gold); border-left: 10px solid var(--gold); }
+        .bottom-right { bottom: 0; right: 0; border-bottom: 10px solid var(--gold); border-right: 10px solid var(--gold); }
+
+        /* 中奖样式 */
+        .winner-text {
+            color: #fff;
+            text-shadow: 0 0 30px #ffd700, 0 0 60px #ffd700;
+            animation: winnerScale 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes winnerScale {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1.2); opacity: 1; }
+        }
+
+        /* 历史记录列表 */
+        .history-list {
+            scrollbar-width: thin;
+            scrollbar-color: var(--gold) transparent;
+        }
+        .history-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .history-list::-webkit-scrollbar-thumb {
+            background-color: var(--gold);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 装饰元素 -->
+    <div class="lantern" style="left: 5%;"></div>
+    <div class="lantern" style="right: 5%;"></div>
+    <div class="corner-decoration top-left"></div>
+    <div class="corner-decoration top-right"></div>
+    <div class="corner-decoration bottom-left"></div>
+    <div class="corner-decoration bottom-right"></div>
+
+    <div class="flex flex-col items-center justify-center h-full py-8 relative">
+        <header class="text-center mb-12">
+            <h1 class="title-font text-8xl mb-4 text-white drop-shadow-[0_5px_15px_rgba(255,215,0,0.3)]">2026 辞旧迎新</h1>
+            <h2 class="text-4xl tracking-[1rem] text-gold opacity-90">公司年会盛典·幸运大抽奖</h2>
+        </header>
+
+        <main class="w-full max-w-4xl px-8 relative">
+            <!-- 居中抽奖区 -->
+            <div class="bg-red-900/40 backdrop-blur-2xl rounded-[3rem] p-16 border-4 border-gold/50 shadow-[0_0_60px_rgba(139,0,0,0.5)] relative overflow-hidden">
+                <!-- 内部装饰线 -->
+                <div class="absolute inset-4 border border-gold/20 rounded-[2.5rem] pointer-events-none"></div>
+                
+                <div id="name-box" class="name-display text-white">
+                    等待开启
+                </div>
+                
+                <div class="flex justify-center mt-16 space-x-10">
+                    <button id="start-btn" class="btn-gold px-16 py-5 rounded-full text-3xl font-extrabold">
+                        开始抽奖
+                    </button>
+                    <button id="stop-btn" class="btn-gold px-16 py-5 rounded-full text-3xl font-extrabold hidden">
+                        停止
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- 侧边中奖记录 (右侧悬浮) -->
+        <aside class="fixed right-8 top-1/2 -translate-y-1/2 w-80 bg-red-700/40 backdrop-blur-xl rounded-3xl p-6 border-2 border-gold/40 shadow-2xl z-20 flex flex-col h-[600px]">
+            <h3 class="title-font text-3xl text-center mb-6 text-gold border-b-2 border-gold/30 pb-4">🏆 中奖名单</h3>
+            <div id="main-winner-list" class="history-list flex-1 overflow-y-auto space-y-4 pr-2">
+                <!-- 记录将在这里动态生成 -->
+            </div>
+            <div class="mt-6 pt-4 border-t border-gold/30 text-center text-gold font-bold">
+                当前候选：<span id="candidate-count" class="text-white">0</span> 人
+            </div>
+        </aside>
+
+        <footer class="mt-12 flex gap-10">
+            <button onclick="toggleSettings()" class="text-xl text-gold/80 underline hover:text-gold transition-colors font-bold">配置名单</button>
+            <button onclick="resetWinners()" class="text-xl text-red-100/80 underline hover:text-red-50 transition-colors font-bold">重置抽奖</button>
+        </footer>
+    </div>
+
+    <!-- 隐藏的设置面板 -->
+    <div id="settings-panel" class="fixed right-0 top-0 h-full w-96 bg-red-700 p-8 transform translate-x-full transition-transform z-50 border-l-4 border-gold/50 shadow-[-20px_0_60px_rgba(0,0,0,0.7)] flex flex-col">
+        <h3 class="title-font text-3xl mb-6 text-gold shrink-0">抽奖名单管理</h3>
+        <textarea id="name-input" class="w-full flex-1 bg-red-900/50 text-white p-4 rounded-2xl border-2 border-gold/30 focus:border-gold/60 outline-none mb-6 text-xl" placeholder="请输入名单，每行一个名字"></textarea>
+        <div class="space-y-4 shrink-0">
+            <button onclick="saveNames()" class="w-full bg-gradient-to-r from-gold to-yellow-500 text-red-900 py-5 rounded-full font-extrabold text-2xl shadow-lg hover:scale-105 transition-transform">保存并更新</button>
+            <button onclick="toggleSettings()" class="w-full bg-white/20 text-white py-4 rounded-full font-bold text-lg hover:bg-white/30 transition-colors">取消关闭</button>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let masterCandidates = ["张三", "李四", "王五", "赵六", "钱七", "孙八", "周九", "吴十", "陈十一", "林十二"];
+        let candidates = [];
+        let winners = [];
+        let rolling = false;
+        let rollInterval;
+
+        // 初始化
+        function init() {
+            // 1. 加载原始总名单
+            const savedMaster = localStorage.getItem('lottery_master_candidates');
+            if (savedMaster) {
+                masterCandidates = JSON.parse(savedMaster);
+            }
+            
+            // 2. 加载当前剩余奖池
+            const savedCandidates = localStorage.getItem('lottery_candidates');
+            if (savedCandidates) {
+                candidates = JSON.parse(savedCandidates);
+            } else {
+                candidates = [...masterCandidates];
+            }
+
+            // 3. 加载中奖名单
+            const savedWinners = localStorage.getItem('lottery_winners');
+            if (savedWinners) {
+                winners = JSON.parse(savedWinners);
+            }
+
+            // 4. 同步 UI
+            document.getElementById('name-input').value = masterCandidates.join('\n');
+            updateStats();
+        }
+
+        // 更新状态和持久化
+        function updateStats() {
+            const candidateCountEl = document.getElementById('candidate-count');
+            const mainWinnerListEl = document.getElementById('main-winner-list');
+            
+            if (candidateCountEl) candidateCountEl.textContent = candidates.length;
+            
+            if (mainWinnerListEl) {
+                mainWinnerListEl.innerHTML = winners.map((w, i) => `
+                    <div class="flex items-center justify-between bg-gold/10 p-3 rounded-lg border border-gold/20 animate-fadeIn">
+                        <span class="text-gold font-bold">第 ${i + 1} 位</span>
+                        <span class="text-white text-lg">${w}</span>
+                    </div>
+                `).join('');
+                mainWinnerListEl.scrollTop = mainWinnerListEl.scrollHeight;
+            }
+
+            // 保存到本地
+            localStorage.setItem('lottery_master_candidates', JSON.stringify(masterCandidates));
+            localStorage.setItem('lottery_candidates', JSON.stringify(candidates));
+            localStorage.setItem('lottery_winners', JSON.stringify(winners));
+        }
+
+        // 切换设置面板
+        function toggleSettings() {
+            const panel = document.getElementById('settings-panel');
+            if (panel) {
+                panel.classList.toggle('translate-x-full');
+                // 每次打开时确保文本框内容是最新的 masterCandidates
+                if (!panel.classList.contains('translate-x-full')) {
+                    document.getElementById('name-input').value = masterCandidates.join('\n');
+                }
+            }
+        }
+
+        // 保存名单
+        function saveNames() {
+            const nameInput = document.getElementById('name-input');
+            const input = nameInput.value.trim();
+            
+            // 更新总名单 (允许为空)
+            masterCandidates = input.split('\n').map(n => n.trim()).filter(n => n);
+            
+            // 询问是否重置奖池
+            const shouldReset = confirm("名单已保存！\n\n是否立即重置奖池（清空已中奖记录）？\n点击[确定]：从新名单开始全新抽奖\n点击[取消]：保留已中奖人员，仅更新剩余奖池");
+            
+            if (shouldReset) {
+                candidates = [...masterCandidates];
+                winners = [];
+                const nameBox = document.getElementById('name-box');
+                if (nameBox) {
+                    nameBox.textContent = "等待开启";
+                    nameBox.classList.remove('winner-text');
+                }
+            } else {
+                // 不重置：剩余奖池 = 新总名单 - 已中奖人员
+                candidates = masterCandidates.filter(name => !winners.includes(name));
+            }
+            
+            updateStats();
+            toggleSettings();
+            alert("名单管理已成功更新！");
+        }
+
+        // 重置抽奖
+        function resetWinners() {
+            if (confirm("确定要重置抽奖吗？\n这将把所有【原始名单】中的人员放回奖池，并清空所有中奖记录。")) {
+                candidates = [...masterCandidates];
+                winners = [];
+                const nameBox = document.getElementById('name-box');
+                if (nameBox) {
+                    nameBox.textContent = "等待开启";
+                    nameBox.classList.remove('winner-text');
+                }
+                updateStats();
+                alert("抽奖已重置！");
+            }
+        }
+
+        // 开始抽奖
+        function startRoll() {
+            if (candidates.length === 0) {
+                alert("当前奖池已空，请先在配置中添加名单或重置抽奖！");
+                return;
+            }
+            
+            const nameBox = document.getElementById('name-box');
+            const startBtn = document.getElementById('start-btn');
+            const stopBtn = document.getElementById('stop-btn');
+            
+            rolling = true;
+            if (nameBox) {
+                nameBox.classList.remove('winner-text');
+                nameBox.classList.add('rolling');
+            }
+            if (startBtn) startBtn.classList.add('hidden');
+            if (stopBtn) stopBtn.classList.remove('hidden');
+            
+            rollInterval = setInterval(() => {
+                const randomIndex = Math.floor(Math.random() * candidates.length);
+                if (nameBox) nameBox.textContent = candidates[randomIndex];
+            }, 50);
+        }
+
+        // 停止抽奖
+        function stopRoll() {
+            rolling = false;
+            clearInterval(rollInterval);
+            
+            const nameBox = document.getElementById('name-box');
+            const startBtn = document.getElementById('start-btn');
+            const stopBtn = document.getElementById('stop-btn');
+            
+            if (nameBox) nameBox.classList.remove('rolling');
+            if (startBtn) startBtn.classList.remove('hidden');
+            if (stopBtn) stopBtn.classList.add('hidden');
+
+            // 随机抽取一名
+            const winnerIndex = Math.floor(Math.random() * candidates.length);
+            const winner = candidates.splice(winnerIndex, 1)[0];
+            winners.push(winner);
+            
+            if (nameBox) {
+                nameBox.textContent = winner;
+                nameBox.classList.add('winner-text');
+            }
+            
+            triggerConfetti();
+            updateStats();
+        }
+
+        // 纸屑特效
+        function triggerConfetti() {
+            const duration = 3 * 1000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#ffd700', '#ff0000', '#ffffff']
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#ffd700', '#ff0000', '#ffffff']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        // 绑定按钮事件
+        document.addEventListener('DOMContentLoaded', () => {
+            init();
+            const startBtn = document.getElementById('start-btn');
+            const stopBtn = document.getElementById('stop-btn');
+            if (startBtn) startBtn.addEventListener('click', startRoll);
+            if (stopBtn) stopBtn.addEventListener('click', stopRoll);
+        });
+    </script>
+</body>
+</html>
