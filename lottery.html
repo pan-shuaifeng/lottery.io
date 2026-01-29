@@ -6,7 +6,8 @@
     <title>2026 新春年会抽奖</title>
     <script src="assets/tailwind.min.js"></script>
     <script>
-        tailwind.config = {
+        // 确保 tailwind 加载成功后的配置
+        window.tailwind && (tailwind.config = {
             theme: {
                 extend: {
                     colors: {
@@ -16,9 +17,10 @@
                     }
                 }
             }
-        }
+        });
     </script>
     <script src="assets/confetti.browser.min.js"></script>
+    <!-- 使用更可靠的字体镜像 -->
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -32,11 +34,62 @@
             background: radial-gradient(circle at center, var(--new-year-red) 0%, var(--deep-red) 100%);
             color: var(--gold);
             font-family: 'Noto Serif SC', serif;
-            overflow-x: hidden;
-            overflow-y: auto;
-            min-height: 100vh;
             margin: 0;
             position: relative;
+            min-height: 100vh;
+            /* 桌面端隐藏滚动条，保持精致感；移动端允许滚动 */
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        @media (min-width: 1024px) {
+            body {
+                height: 100vh;
+                overflow: hidden;
+            }
+        }
+
+        /* 基础布局兜底，防止 Tailwind 加载失败或延迟 */
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            position: relative;
+        }
+
+        .lottery-main {
+            width: 100%;
+            max-width: 56rem;
+            padding: 0 1rem;
+            position: relative;
+        }
+
+        @media (min-width: 768px) {
+            .lottery-main {
+                padding: 0 2rem;
+            }
+        }
+
+        .lottery-box {
+            background-color: rgba(127, 29, 29, 0.4);
+            backdrop-filter: blur(24px);
+            border-radius: 2rem;
+            padding: 2rem;
+            border-width: 4px;
+            border-color: rgba(255, 215, 0, 0.5);
+            box-shadow: 0 0 60px rgba(139, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        @media (min-width: 768px) {
+            .lottery-box {
+                border-radius: 3rem;
+                padding: 4rem;
+            }
         }
 
         /* 预定义一些关键类，防止 Tailwind 加载前的黑色闪烁 */
@@ -230,15 +283,15 @@
     <div class="corner-decoration bottom-left"></div>
     <div class="corner-decoration bottom-right"></div>
 
-    <div class="flex flex-col items-center justify-center min-h-screen py-8 px-4 relative">
+    <div class="main-container flex flex-col items-center justify-center min-h-screen py-8 px-4 relative">
         <header class="text-center mb-8 md:mb-12">
             <h1 class="title-font text-5xl sm:text-7xl md:text-8xl mb-4 text-white drop-shadow-[0_5px_15px_rgba(255,215,0,0.3)]">2026 辞旧迎新</h1>
             <h2 class="text-xl sm:text-3xl md:text-4xl tracking-[0.5rem] md:tracking-[1rem] text-gold opacity-90">公司年会盛典·幸运大抽奖</h2>
         </header>
 
-        <main class="w-full max-w-4xl px-4 md:px-8 relative">
+        <main class="lottery-main w-full max-w-4xl px-4 md:px-8 relative">
             <!-- 居中抽奖区 -->
-            <div class="bg-red-900/40 backdrop-blur-2xl rounded-[2rem] md:rounded-[3rem] p-8 md:p-16 border-4 border-gold/50 shadow-[0_0_60px_rgba(139,0,0,0.5)] relative overflow-hidden">
+            <div class="lottery-box bg-red-900/40 backdrop-blur-2xl rounded-[2rem] md:rounded-[3rem] p-8 md:p-16 border-4 border-gold/50 shadow-[0_0_60px_rgba(139,0,0,0.5)] relative overflow-hidden">
                 <!-- 内部装饰线 -->
                 <div class="absolute inset-4 border border-gold/20 rounded-[1.5rem] md:rounded-[2.5rem] pointer-events-none"></div>
                 
