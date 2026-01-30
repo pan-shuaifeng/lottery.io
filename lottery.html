@@ -38,15 +38,44 @@
             margin: 0;
             position: relative;
             min-height: 100vh;
-            /* 桌面端隐藏滚动条，保持精致感；移动端允许滚动 */
             overflow-x: hidden;
             overflow-y: auto;
+            /* 解决移动端点击高亮 */
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 响应式字体大小优化 */
+        .fluid-title {
+            font-size: clamp(2.5rem, 8vw, 5.5rem);
+            line-height: 1.1;
+        }
+
+        .fluid-subtitle {
+            font-size: clamp(1rem, 3vw, 2rem);
+            letter-spacing: clamp(0.2rem, 1vw, 1rem);
+        }
+
+        .fluid-name {
+            font-size: clamp(3rem, 12vw, 7rem);
+            line-height: 1;
         }
 
         @media (min-width: 1024px) {
             body {
+                /* 只有当高度足够时才锁定高度 */
                 height: 100vh;
                 overflow: hidden;
+            }
+        }
+        
+        /* 针对小屏幕高度的适配 */
+        @media (max-height: 700px) and (min-width: 1024px) {
+            body {
+                height: auto;
+                overflow-y: auto;
+            }
+            .main-container {
+                padding: 2rem 0;
             }
         }
 
@@ -153,24 +182,14 @@
 
         /* 名字滚动区域 */
         .name-display {
-            height: 160px;
+            height: clamp(120px, 20vh, 200px);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 4rem;
             text-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 215, 0, 0.4);
             transition: all 0.1s;
-            letter-spacing: 0.2rem;
             word-break: break-all;
             text-align: center;
-        }
-
-        @media (min-width: 640px) {
-            .name-display {
-                height: 200px;
-                font-size: 8rem;
-                letter-spacing: 0.5rem;
-            }
         }
 
         .rolling {
@@ -284,19 +303,19 @@
     <div class="corner-decoration bottom-left"></div>
     <div class="corner-decoration bottom-right"></div>
 
-    <div class="main-container flex flex-col items-center justify-center min-h-screen py-8 px-4 relative">
-        <header class="text-center mb-8 md:mb-12">
-            <h1 class="title-font text-5xl sm:text-7xl md:text-8xl mb-4 text-white drop-shadow-[0_5px_15px_rgba(255,215,0,0.3)]">2026 辞旧迎新</h1>
-            <h2 class="text-xl sm:text-3xl md:text-4xl tracking-[0.5rem] md:tracking-[1rem] text-gold opacity-90">公司年会盛典·幸运大抽奖</h2>
+    <div class="main-container flex flex-col items-center justify-center min-h-screen py-4 md:py-8 px-4 relative">
+        <header class="text-center mb-6 md:mb-12">
+            <h1 class="title-font fluid-title mb-4 text-white drop-shadow-[0_5px_15px_rgba(255,215,0,0.3)]">2026 辞旧迎新</h1>
+            <h2 class="fluid-subtitle text-gold opacity-90">公司年会盛典·幸运大抽奖</h2>
         </header>
 
         <main class="lottery-main w-full max-w-4xl px-4 md:px-8 relative">
             <!-- 居中抽奖区 -->
-            <div class="lottery-box bg-red-900/40 backdrop-blur-2xl rounded-[2rem] md:rounded-[3rem] p-8 md:p-16 border-4 border-gold/50 shadow-[0_0_60px_rgba(139,0,0,0.5)] relative overflow-hidden">
+            <div class="lottery-box bg-red-900/40 backdrop-blur-2xl rounded-[2rem] md:rounded-[3rem] p-6 md:p-16 border-4 border-gold/50 shadow-[0_0_60px_rgba(139,0,0,0.5)] relative overflow-hidden">
                 <!-- 内部装饰线 -->
                 <div class="absolute inset-4 border border-gold/20 rounded-[1.5rem] md:rounded-[2.5rem] pointer-events-none"></div>
                 
-                <div id="name-box" class="name-display text-white">
+                <div id="name-box" class="name-display fluid-name text-white">
                     等待开启
                 </div>
                 
