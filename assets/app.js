@@ -3,6 +3,7 @@ let candidates = []
 let winners = []
 let rolling = false
 let rollInterval
+const ROLL_INTERVAL_MS = 25
 
 function init() {
   const savedMaster = localStorage.getItem('lottery_master_candidates')
@@ -134,7 +135,7 @@ function startRoll() {
   rollInterval = setInterval(() => {
     const randomIndex = Math.floor(Math.random() * candidates.length)
     if (nameBox) nameBox.textContent = candidates[randomIndex]
-  }, 50)
+  }, ROLL_INTERVAL_MS)
 }
 
 function stopRoll() {
@@ -199,4 +200,3 @@ window.toggleWinners = toggleWinners
 window.toggleSettings = toggleSettings
 window.saveNames = saveNames
 window.resetWinners = resetWinners
-
