@@ -1,0 +1,7 @@
+{
+  "name": "lottery-pages",
+  "private": true,
+  "scripts": {
+    "build": "node build.js"
+  }
+}
