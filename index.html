@@ -1,0 +1,2298 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <title>新春年会点名抽奖</title>
+    <script src="assets/viewport.js"></script>
+    <script src="assets/tailwind-config.js"></script>
+    <script src="assets/tailwind.min.js"></script>
+    <script src="assets/confetti.browser.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@600;700;900&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --red-950: #3a0505;
+        --red-900: #5c0b0b;
+        --red-800: #7b1111;
+        --red-700: #a61b1b;
+        --red-600: #c81e1e;
+        --gold: #ffd98a;
+        --gold-strong: #ffd700;
+        --gold-deep: #ffae00;
+        --ink: rgba(255, 255, 255, 0.86);
+        --glass: rgba(18, 8, 8, 0.42);
+        --glass-2: rgba(18, 8, 8, 0.62);
+        --stroke: rgba(255, 217, 138, 0.26);
+        --stroke-2: rgba(255, 217, 138, 0.42);
+        --shadow: rgba(0, 0, 0, 0.55);
+        --ui-scale: 1;
+        --pvw: 1vw;
+        --pvh: 1vh;
+      }
+
+      html {
+        font-size: calc(16px * var(--ui-scale));
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(1100px 700px at 20% 10%, rgba(255, 215, 0, 0.14) 0%, rgba(255, 215, 0, 0) 60%),
+          radial-gradient(900px 640px at 90% 20%, rgba(255, 35, 35, 0.25) 0%, rgba(255, 35, 35, 0) 58%),
+          radial-gradient(1200px 900px at 50% 110%, rgba(255, 174, 0, 0.14) 0%, rgba(255, 174, 0, 0) 60%),
+          linear-gradient(160deg, var(--red-950), var(--red-800) 55%, var(--red-900));
+        color: var(--ink);
+        font-family: "Noto Serif SC", serif;
+        overflow-x: hidden;
+      }
+
+      .title-font {
+        font-family: "Ma Shan Zheng", cursive;
+      }
+
+      .grain {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          radial-gradient(circle at 15% 25%, rgba(255, 255, 255, 0.05) 0, rgba(255, 255, 255, 0) 45%),
+          radial-gradient(circle at 85% 25%, rgba(255, 255, 255, 0.05) 0, rgba(255, 255, 255, 0) 46%),
+          radial-gradient(circle at 45% 85%, rgba(255, 255, 255, 0.04) 0, rgba(255, 255, 255, 0) 55%),
+          repeating-conic-gradient(from 220deg at 50% 50%, rgba(255, 217, 138, 0.03) 0 5deg, rgba(255, 217, 138, 0) 5deg 14deg),
+          repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.018) 0 1px, rgba(255, 255, 255, 0) 1px 6px);
+        mix-blend-mode: overlay;
+        opacity: 0.8;
+        filter: blur(0.1px);
+        animation: drift 18s linear infinite;
+      }
+
+      @keyframes drift {
+        0% { transform: translate3d(0, 0, 0) scale(1); }
+        50% { transform: translate3d(-2%, 1.2%, 0) scale(1.02); }
+        100% { transform: translate3d(0, 0, 0) scale(1); }
+      }
+
+      .fx {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      .shell {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        min-height: 100vh;
+      }
+
+      .topbar {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 14px;
+        align-items: center;
+        padding: clamp(16px, 3.4vw, 28px) clamp(14px, 4vw, 36px);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, rgba(255, 217, 138, 0.14), rgba(255, 217, 138, 0.06));
+        border: 1px solid var(--stroke);
+        box-shadow: 0 14px 60px rgba(0, 0, 0, 0.25);
+        backdrop-filter: blur(14px);
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.22);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(12px);
+      }
+
+      .hero-title {
+        font-size: clamp(2.2rem, calc(6.5 * var(--pvw)), 5.6rem);
+        letter-spacing: 0.06em;
+        line-height: 1.05;
+        text-shadow:
+          0 18px 50px rgba(0, 0, 0, 0.55),
+          0 0 42px rgba(255, 174, 0, 0.42),
+          0 0 12px rgba(255, 215, 0, 0.28);
+      }
+
+      .hero-subtitle {
+        margin-top: 8px;
+        font-size: clamp(1rem, calc(2.3 * var(--pvw)), 1.9rem);
+        color: rgba(255, 255, 255, 0.82);
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+      }
+
+      .stage-wrap {
+        display: grid;
+        gap: 18px;
+        padding: 0 clamp(14px, 4vw, 36px) clamp(18px, 4vw, 30px);
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      @media (min-width: 1100px) {
+        .stage-wrap {
+          grid-template-columns: 1.35fr 0.65fr;
+          gap: 22px;
+        }
+      }
+
+      .panel {
+        background: linear-gradient(180deg, rgba(10, 6, 6, 0.45), rgba(10, 6, 6, 0.68));
+        border: 1px solid rgba(255, 217, 138, 0.22);
+        border-radius: 28px;
+        box-shadow:
+          0 30px 110px rgba(0, 0, 0, 0.55),
+          inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(18px);
+        overflow: hidden;
+      }
+
+      .panel-inner {
+        padding: clamp(16px, 3.5vw, 26px);
+      }
+
+      .stage {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .stage::before {
+        content: "";
+        position: absolute;
+        inset: -40px;
+        background:
+          radial-gradient(620px 320px at 30% 10%, rgba(255, 215, 0, 0.16) 0%, rgba(255, 215, 0, 0) 62%),
+          radial-gradient(520px 300px at 85% 22%, rgba(255, 40, 40, 0.22) 0%, rgba(255, 40, 40, 0) 62%),
+          radial-gradient(740px 520px at 50% 110%, rgba(255, 174, 0, 0.16) 0%, rgba(255, 174, 0, 0) 58%),
+          repeating-conic-gradient(from 120deg at 50% 50%, rgba(255, 217, 138, 0.05) 0 8deg, rgba(255, 217, 138, 0) 8deg 22deg);
+        filter: blur(0.2px);
+        opacity: 0.9;
+        animation: aura 10s ease-in-out infinite;
+      }
+
+      @keyframes aura {
+        0% { transform: translate3d(0, 0, 0) scale(1); }
+        50% { transform: translate3d(-1.4%, 0.8%, 0) scale(1.03); }
+        100% { transform: translate3d(0, 0, 0) scale(1); }
+      }
+
+      .stage::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(circle at 50% 50%, rgba(255, 217, 138, 0.14) 0, rgba(255, 217, 138, 0) 56%),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(0, 0, 0, 0.2));
+        mix-blend-mode: overlay;
+        opacity: 0.9;
+        pointer-events: none;
+      }
+
+      .stage-content {
+        position: relative;
+        z-index: 1;
+      }
+
+      .prize-line {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+        justify-content: space-between;
+      }
+
+      .prize-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.16), rgba(255, 40, 40, 0.14));
+        border: 1px solid rgba(255, 217, 138, 0.22);
+        backdrop-filter: blur(14px);
+      }
+
+      .prize-name {
+        font-weight: 900;
+        color: rgba(255, 217, 138, 0.96);
+        font-size: clamp(1.1rem, calc(2.3 * var(--pvw)), 1.6rem);
+      }
+
+      .prize-meta {
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.78);
+        letter-spacing: 0.08em;
+      }
+
+      .stage-display {
+        margin-top: 16px;
+        border-radius: 26px;
+        border: 1px solid rgba(255, 217, 138, 0.22);
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.52));
+        box-shadow:
+          0 26px 120px rgba(0, 0, 0, 0.62),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        padding: clamp(16px, 3.4vw, 26px);
+        position: relative;
+        overflow: hidden;
+        height: clamp(260px, 38vh, 460px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .stage-display.mode-multi {
+        overflow: auto;
+      }
+
+      .stage-display.mode-multi::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+
+      .stage-display.mode-multi::-webkit-scrollbar-thumb {
+        background: rgba(255, 217, 138, 0.22);
+        border-radius: 999px;
+        border: 2px solid rgba(0, 0, 0, 0.35);
+      }
+
+      .stage-display.mode-multi::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.22);
+        border-radius: 999px;
+      }
+
+      .stage-display::before {
+        content: "";
+        position: absolute;
+        inset: -20%;
+        background: radial-gradient(circle at 50% 40%, rgba(255, 215, 0, 0.22) 0, rgba(255, 215, 0, 0) 58%);
+        filter: blur(0.4px);
+        opacity: 0.8;
+        animation: pulse 2.6s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0% { transform: scale(0.98); opacity: 0.65; }
+        50% { transform: scale(1.04); opacity: 0.9; }
+        100% { transform: scale(0.98); opacity: 0.65; }
+      }
+
+      .display-grid {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+        align-items: center;
+        justify-items: center;
+        width: 100%;
+      }
+
+      .display-grid.grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .display-grid.grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .display-grid.grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+      .display-grid.single {
+        height: 100%;
+      }
+
+      .name-card {
+        width: 100%;
+        max-width: 820px;
+        border-radius: 20px;
+        padding: clamp(16px, 3.3vw, 22px);
+        background: linear-gradient(180deg, rgba(255, 217, 138, 0.09), rgba(0, 0, 0, 0.24));
+        border: 1px solid rgba(255, 217, 138, 0.24);
+        box-shadow:
+          0 26px 90px rgba(0, 0, 0, 0.46),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        transform: translate3d(0, 0, 0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+
+      .display-grid.single .name-card {
+        height: 100%;
+      }
+
+      .name-text {
+        display: block;
+        width: 100%;
+        text-align: center;
+        font-size: clamp(2.2rem, calc(7.8 * var(--pvw)), 7.2rem);
+        font-weight: 900;
+        color: rgba(255, 217, 138, 0.98);
+        letter-spacing: clamp(0.06em, 0.6vw, 0.18em);
+        text-shadow:
+          0 26px 70px rgba(0, 0, 0, 0.72),
+          0 0 32px rgba(255, 215, 0, 0.48),
+          0 0 10px rgba(255, 174, 0, 0.35);
+        white-space: nowrap;
+        word-break: keep-all;
+        max-width: 100%;
+        line-height: 1.05;
+        transform: translate3d(0, 0, 0);
+      }
+
+      .name-card.marquee {
+        justify-content: flex-start;
+        mask-image: linear-gradient(90deg, transparent 0, #000 12%, #000 88%, transparent 100%);
+        -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 12%, #000 88%, transparent 100%);
+      }
+
+      .name-card.marquee .name-text {
+        display: inline-block;
+        width: max-content;
+        padding-right: 2.6rem;
+        animation: marquee var(--marquee-dur, 9s) linear infinite;
+        will-change: transform;
+      }
+
+      @keyframes marquee {
+        0% { transform: translate3d(0, 0, 0); }
+        100% { transform: translate3d(calc(-1 * var(--marquee-shift, 0px)), 0, 0); }
+      }
+
+      .rolling .name-text {
+        animation: jitter 90ms linear infinite;
+        filter: blur(0.8px);
+      }
+
+      @keyframes jitter {
+        0% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.85; }
+        50% { transform: translate3d(0.8px, -0.8px, 0) scale(1.01); opacity: 1; }
+        100% { transform: translate3d(-0.8px, 0.7px, 0) scale(1); opacity: 0.9; }
+      }
+
+      .winner-pop {
+        animation: pop 560ms cubic-bezier(.19, 1, .22, 1) both;
+      }
+
+      @keyframes pop {
+        0% { transform: translate3d(0, 10px, 0) scale(0.96); opacity: 0; filter: blur(2px); }
+        55% { transform: translate3d(0, -6px, 0) scale(1.02); opacity: 1; filter: blur(0); }
+        100% { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
+      }
+
+      .dock {
+        padding: 0 clamp(14px, 4vw, 36px) clamp(18px, 4vw, 30px);
+      }
+
+      .dock-inner {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: 1fr;
+      }
+
+      @media (min-width: 820px) {
+        .dock-inner {
+          grid-template-columns: 1fr auto;
+          align-items: center;
+        }
+      }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+      }
+
+      .btn {
+        border: 0;
+        border-radius: 18px;
+        padding: 14px 16px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        cursor: pointer;
+        transition: transform 120ms ease, filter 120ms ease, background 200ms ease;
+        user-select: none;
+        outline: none;
+      }
+
+      .btn:focus-visible {
+        box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.16), 0 0 0 1px rgba(255, 215, 0, 0.55) inset;
+      }
+
+      .btn-primary {
+        color: #3b0606;
+        background: linear-gradient(135deg, var(--gold-strong), var(--gold-deep));
+        box-shadow: 0 18px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+      }
+
+      .btn-primary:hover { filter: brightness(1.06); transform: translate3d(0, -1px, 0); }
+      .btn-primary:active { transform: translate3d(0, 1px, 0) scale(0.99); }
+
+      .btn-ghost {
+        color: rgba(255, 255, 255, 0.88);
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.55));
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        backdrop-filter: blur(14px);
+      }
+
+      .btn-ghost:hover { filter: brightness(1.07); transform: translate3d(0, -1px, 0); }
+      .btn-ghost:active { transform: translate3d(0, 1px, 0) scale(0.99); }
+
+      .btn-danger {
+        color: rgba(255, 255, 255, 0.95);
+        background: linear-gradient(135deg, rgba(255, 60, 60, 0.82), rgba(255, 140, 0, 0.28));
+        border: 1px solid rgba(255, 200, 200, 0.16);
+      }
+
+      .btn-danger:hover { filter: brightness(1.06); transform: translate3d(0, -1px, 0); }
+
+      .mini {
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        padding: 10px 12px;
+        border-radius: 14px;
+      }
+
+      .input {
+        width: 100%;
+        border-radius: 16px;
+        padding: 12px 14px;
+        background: rgba(0, 0, 0, 0.35);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        color: rgba(255, 255, 255, 0.9);
+        outline: none;
+      }
+
+      .input:focus-visible {
+        border-color: rgba(255, 215, 0, 0.55);
+        box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.14);
+      }
+
+      .list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 12px;
+        border-radius: 16px;
+        background: rgba(0, 0, 0, 0.22);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .row strong {
+        color: rgba(255, 217, 138, 0.95);
+      }
+
+      .muted {
+        color: rgba(255, 255, 255, 0.72);
+      }
+
+      .drawer {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: none;
+      }
+
+      .drawer.open { display: block; }
+
+      .drawer-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(6px);
+      }
+
+      .drawer-panel {
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 100%;
+        width: min(720px, 92vw);
+        background: linear-gradient(180deg, rgba(18, 8, 8, 0.92), rgba(10, 6, 6, 0.98));
+        border-left: 1px solid rgba(255, 217, 138, 0.22);
+        box-shadow: -26px 0 120px rgba(0, 0, 0, 0.65);
+        transform: translate3d(102%, 0, 0);
+        transition: transform 240ms ease;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+      }
+
+      .drawer.open .drawer-panel { transform: translate3d(0, 0, 0); }
+
+      .drawer-header {
+        padding: 18px 18px 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        display: grid;
+        gap: 10px;
+      }
+
+      .drawer-title {
+        font-size: 1.5rem;
+        font-weight: 900;
+        color: rgba(255, 217, 138, 0.95);
+      }
+
+      .tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .tab {
+        padding: 10px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(0, 0, 0, 0.28);
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 900;
+        letter-spacing: 0.1em;
+        cursor: pointer;
+      }
+
+      .tab.active {
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.18), rgba(255, 40, 40, 0.18));
+        border-color: rgba(255, 217, 138, 0.28);
+        color: rgba(255, 255, 255, 0.92);
+      }
+
+      .drawer-body {
+        padding: 16px 18px;
+        overflow: auto;
+      }
+
+      .drawer-footer {
+        padding: 14px 18px 18px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+      }
+
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: 22px;
+        transform: translate3d(-50%, 20px, 0);
+        opacity: 0;
+        z-index: 80;
+        padding: 12px 14px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.62);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        backdrop-filter: blur(10px);
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        transition: opacity 180ms ease, transform 180ms ease;
+        max-width: min(92vw, 720px);
+        text-align: center;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translate3d(-50%, 0, 0);
+      }
+
+      .overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 70;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+      }
+
+      .overlay.open { display: flex; }
+
+      .modal {
+        width: min(640px, 94vw);
+        border-radius: 24px;
+        border: 1px solid rgba(255, 217, 138, 0.24);
+        background: linear-gradient(180deg, rgba(18, 8, 8, 0.9), rgba(8, 6, 6, 0.98));
+        box-shadow: 0 30px 120px rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(16px);
+        overflow: hidden;
+      }
+
+      .modal-head {
+        padding: 16px 18px 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .modal-head h3 {
+        margin: 0;
+        font-weight: 900;
+        color: rgba(255, 217, 138, 0.95);
+        letter-spacing: 0.08em;
+      }
+
+      .modal-body {
+        padding: 14px 18px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .modal-foot {
+        padding: 12px 18px 16px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .lanterns {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      .lantern {
+        position: absolute;
+        top: -30px;
+        width: clamp(70px, 7vw, 110px);
+        height: clamp(86px, 8vw, 132px);
+        left: var(--x);
+        transform-origin: top center;
+        animation: sway var(--dur) ease-in-out infinite alternate;
+        filter: drop-shadow(0 14px 30px rgba(0, 0, 0, 0.45));
+        opacity: 0.95;
+      }
+
+      @keyframes sway {
+        0% { transform: rotate(-5deg) translate3d(0, 0, 0); }
+        100% { transform: rotate(5deg) translate3d(0, 0, 0); }
+      }
+
+      .lantern .lamp {
+        width: 100%;
+        height: 100%;
+        border-radius: 50% 50% 46% 46%;
+        background:
+          radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.34) 0, rgba(255, 255, 255, 0) 38%),
+          radial-gradient(circle at 50% 60%, rgba(255, 215, 0, 0.22) 0, rgba(255, 215, 0, 0) 52%),
+          linear-gradient(180deg, rgba(255, 60, 60, 0.98), rgba(188, 14, 14, 0.98));
+        border: 1px solid rgba(255, 217, 138, 0.18);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 0 46px rgba(255, 60, 60, 0.4);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .lantern .lamp::after {
+        content: "";
+        position: absolute;
+        inset: 14% 18%;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.14);
+        border: 1px solid rgba(255, 217, 138, 0.16);
+      }
+
+      .lantern .tassel {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: -40px;
+        width: 2px;
+        height: 46px;
+        background: linear-gradient(180deg, rgba(255, 217, 138, 0.9), rgba(255, 217, 138, 0.2));
+      }
+
+      .lantern .tassel::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 80%;
+        transform: translateX(-50%);
+        width: 18px;
+        height: 18px;
+        border-radius: 999px;
+        background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.6), rgba(255, 215, 0, 0.2) 40%, rgba(255, 174, 0, 0.9));
+        box-shadow: 0 0 16px rgba(255, 215, 0, 0.35);
+      }
+
+      .hidden { display: none !important; }
+    </style>
+  </head>
+  <body>
+    <canvas class="fx" id="fx-bg"></canvas>
+    <canvas class="fx" id="fx-fireworks"></canvas>
+    <div class="grain"></div>
+    <div class="lanterns" aria-hidden="true">
+      <div class="lantern" style="--x: 4%; --dur: 3.2s">
+        <div class="lamp"></div>
+        <div class="tassel"></div>
+      </div>
+      <div class="lantern" style="--x: 16%; --dur: 3.8s">
+        <div class="lamp"></div>
+        <div class="tassel"></div>
+      </div>
+      <div class="lantern" style="--x: 82%; --dur: 3.4s">
+        <div class="lamp"></div>
+        <div class="tassel"></div>
+      </div>
+      <div class="lantern" style="--x: 92%; --dur: 4.1s">
+        <div class="lamp"></div>
+        <div class="tassel"></div>
+      </div>
+    </div>
+
+    <div class="shell">
+      <header class="topbar">
+        <div>
+          <div class="badge">
+            <span class="title-font hero-title" id="heroTitle">新春年会点名抽奖</span>
+          </div>
+          <div class="hero-subtitle">Roll Call · Lucky Draw · 2026</div>
+        </div>
+        <div class="pill">
+          <span class="muted" style="font-weight: 900; letter-spacing: 0.12em">剩余</span>
+          <span id="countLeft" style="font-weight: 900; color: rgba(255, 217, 138, 0.96); font-size: 1.2rem">0</span>
+          <span class="muted" style="font-weight: 900; letter-spacing: 0.12em">已中</span>
+          <span id="countWon" style="font-weight: 900; color: rgba(255, 217, 138, 0.96); font-size: 1.2rem">0</span>
+          <button class="btn btn-ghost mini" id="openConsoleBtn" type="button">控制台</button>
+        </div>
+      </header>
+
+      <main class="stage-wrap">
+        <section class="panel stage" aria-label="抽奖舞台">
+          <div class="panel-inner stage-content">
+            <div class="prize-line">
+              <div class="prize-tag">
+                <span style="font-weight: 900; letter-spacing: 0.14em; color: rgba(255, 255, 255, 0.88)">当前奖项</span>
+                <span class="prize-name" id="prizeName">—</span>
+              </div>
+              <div class="prize-tag">
+                <span class="prize-meta" id="prizeProgress">0/0</span>
+                <span class="muted" style="font-weight: 900; letter-spacing: 0.16em">本轮</span>
+                <input class="input" id="perDrawInput" inputmode="numeric" style="width: 100px; padding: 10px 12px; border-radius: 14px" value="1" />
+              </div>
+            </div>
+
+            <div class="stage-display" id="stageDisplay">
+              <div class="display-grid" id="displayGrid">
+                <div class="name-card">
+                  <span class="name-text" id="stageText">准备开始</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="controls" style="margin-top: 16px">
+              <button class="btn btn-primary" id="startStopBtn" type="button">开始</button>
+              <button class="btn btn-ghost" id="nextPrizeBtn" type="button">下一奖项</button>
+              <button class="btn btn-ghost" id="revealBtn" type="button">主持人口播</button>
+              <button class="btn btn-danger" id="resetBtn" type="button">重置</button>
+            </div>
+
+            <div class="muted" style="margin-top: 12px; text-align: center; font-weight: 800; letter-spacing: 0.1em">
+              快捷键：Space 开始/停止 · Enter 停止开奖 · R 重置 · C 打开控制台
+            </div>
+          </div>
+        </section>
+
+        <aside class="panel" aria-label="中奖记录">
+          <div class="panel-inner" style="display: grid; gap: 12px">
+            <div class="prize-line">
+              <div class="prize-tag">
+                <span style="font-weight: 900; letter-spacing: 0.14em; color: rgba(255, 255, 255, 0.88)">中奖名单</span>
+              </div>
+              <button class="btn btn-ghost mini" id="exportBtn" type="button">导出</button>
+            </div>
+
+            <div class="list" id="winnerList" style="max-height: 52vh; overflow: auto; padding-right: 4px"></div>
+
+            <div class="row">
+              <div>
+                <div style="font-weight: 900; letter-spacing: 0.1em">公平随机</div>
+                <div class="muted" id="fairnessText" style="font-weight: 800; letter-spacing: 0.08em; font-size: 0.9rem">—</div>
+              </div>
+              <button class="btn btn-ghost mini" id="rerollSeedBtn" type="button">换种子</button>
+            </div>
+          </div>
+        </aside>
+      </main>
+
+      <footer class="dock">
+        <div class="dock-inner">
+          <div class="panel">
+            <div class="panel-inner" style="display: grid; gap: 10px">
+              <div class="prize-line">
+                <div class="prize-tag">
+                  <span class="muted" style="font-weight: 900; letter-spacing: 0.14em">奖池</span>
+                  <span id="poolName" style="font-weight: 900; color: rgba(255, 217, 138, 0.96)">默认名单</span>
+                </div>
+                <div class="prize-tag">
+                  <span class="muted" style="font-weight: 900; letter-spacing: 0.14em">状态</span>
+                  <span id="statusText" style="font-weight: 900; color: rgba(255, 255, 255, 0.86)">待机</span>
+                </div>
+              </div>
+              <div class="muted" style="font-weight: 800; letter-spacing: 0.08em">
+                支持：名单导入（TXT/CSV）· 奖项配置 · 自动去重 · 导出中奖记录（CSV/JSON）· 本地自动保存
+              </div>
+            </div>
+          </div>
+          <div class="controls">
+            <button class="btn btn-ghost mini" id="soundBtn" type="button">音效：开</button>
+            <button class="btn btn-ghost mini" id="autoRemoveBtn" type="button">去重：开</button>
+            <button class="btn btn-ghost mini" id="autoAdvanceBtn" type="button">自动切换：开</button>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <div class="drawer" id="consoleDrawer" role="dialog" aria-modal="true" aria-label="抽奖控制台">
+      <div class="drawer-backdrop" id="consoleBackdrop"></div>
+      <div class="drawer-panel">
+        <div class="drawer-header">
+          <div class="prize-line">
+            <div class="drawer-title">抽奖控制台</div>
+            <button class="btn btn-ghost mini" id="closeConsoleBtn" type="button">关闭</button>
+          </div>
+          <div class="tabs">
+            <button class="tab active" data-tab="tab-prize" type="button">奖项</button>
+            <button class="tab" data-tab="tab-names" type="button">名单</button>
+            <button class="tab" data-tab="tab-settings" type="button">设置</button>
+            <button class="tab" data-tab="tab-history" type="button">记录</button>
+          </div>
+        </div>
+
+        <div class="drawer-body">
+          <section id="tab-prize">
+            <div class="row">
+              <div>
+                <div style="font-weight: 900; letter-spacing: 0.1em">奖项配置</div>
+                <div class="muted" style="font-weight: 800; letter-spacing: 0.08em">每行一个奖项：奖项名,总名额,每轮人数</div>
+              </div>
+              <button class="btn btn-ghost mini" id="loadDefaultPrizeBtn" type="button">恢复默认</button>
+            </div>
+            <textarea class="input" id="prizeTextarea" rows="10" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace"></textarea>
+            <div class="muted" style="font-weight: 800; letter-spacing: 0.08em; margin-top: 10px">
+              例：特等奖,1,1
+            </div>
+          </section>
+
+          <section id="tab-names" class="hidden">
+            <div class="row">
+              <div>
+                <div style="font-weight: 900; letter-spacing: 0.1em">名单管理</div>
+                <div class="muted" style="font-weight: 800; letter-spacing: 0.08em">每行一个名字；支持粘贴 CSV</div>
+              </div>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end">
+                <button class="btn btn-ghost mini" id="importBtn" type="button">导入</button>
+                <button class="btn btn-ghost mini" id="dedupeBtn" type="button">去重</button>
+                <button class="btn btn-danger mini" id="clearNamesBtn" type="button">清空</button>
+              </div>
+            </div>
+            <textarea class="input" id="namesTextarea" rows="12"></textarea>
+            <input id="fileInput" type="file" accept=".txt,.csv" class="hidden" />
+          </section>
+
+          <section id="tab-settings" class="hidden">
+            <div class="list">
+              <div class="row">
+                <div>
+                  <strong>公司名称</strong>
+                  <div class="muted" style="font-weight: 800; letter-spacing: 0.08em">会显示在主标题</div>
+                </div>
+                <input class="input" id="companyInput" placeholder="例如：XX科技" style="max-width: 240px" />
+              </div>
+              <div class="row">
+                <div>
+                  <strong>抽奖速度</strong>
+                  <div class="muted" style="font-weight: 800; letter-spacing: 0.08em">越小越快（ms）</div>
+                </div>
+                <input class="input" id="speedInput" inputmode="numeric" style="max-width: 160px" />
+              </div>
+              <div class="row">
+                <div>
+                  <strong>展示布局</strong>
+                  <div class="muted" style="font-weight: 800; letter-spacing: 0.08em">多人时自动排布</div>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end">
+                  <button class="btn btn-ghost mini" id="layoutAutoBtn" type="button">自动</button>
+                  <button class="btn btn-ghost mini" id="layoutBigBtn" type="button">大屏</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="tab-history" class="hidden">
+            <div class="row">
+              <div>
+                <div style="font-weight: 900; letter-spacing: 0.1em">抽奖记录</div>
+                <div class="muted" style="font-weight: 800; letter-spacing: 0.08em">按时间倒序展示</div>
+              </div>
+              <button class="btn btn-danger mini" id="clearHistoryBtn" type="button">清空记录</button>
+            </div>
+            <div class="list" id="historyList"></div>
+          </section>
+        </div>
+
+        <div class="drawer-footer">
+          <button class="btn btn-ghost" id="cancelConsoleBtn" type="button">取消</button>
+          <button class="btn btn-primary" id="saveConsoleBtn" type="button">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay" id="confirmOverlay" role="dialog" aria-modal="true" aria-label="确认操作">
+      <div class="drawer-backdrop" id="confirmBackdrop"></div>
+      <div class="modal">
+        <div class="modal-head">
+          <h3 id="confirmTitle">确认</h3>
+          <button class="btn btn-ghost mini" id="confirmCloseBtn" type="button">关闭</button>
+        </div>
+        <div class="modal-body">
+          <div id="confirmMessage" class="muted" style="font-weight: 800; letter-spacing: 0.08em"></div>
+        </div>
+        <div class="modal-foot">
+          <button class="btn btn-ghost" id="confirmCancelBtn" type="button">取消</button>
+          <button class="btn btn-primary" id="confirmOkBtn" type="button">确定</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay" id="revealOverlay" role="dialog" aria-modal="true" aria-label="主持人口播模式">
+      <div class="drawer-backdrop" id="revealBackdrop"></div>
+      <div class="modal" style="width: min(980px, 96vw)">
+        <div class="modal-head">
+          <h3>主持人口播</h3>
+          <button class="btn btn-ghost mini" id="revealCloseBtn" type="button">关闭</button>
+        </div>
+        <div class="modal-body" style="gap: 10px">
+          <div class="muted" style="font-weight: 800; letter-spacing: 0.08em">
+            点击“下一位”逐个点名；可用于现场口播。快捷键：N 下一位 · Esc 关闭
+          </div>
+          <div class="stage-display" style="padding: 18px">
+            <div class="display-grid" id="revealGrid">
+              <div class="name-card">
+                <span class="name-text" id="revealText">—</span>
+              </div>
+            </div>
+          </div>
+          <div class="controls">
+            <button class="btn btn-ghost" id="revealPrevBtn" type="button">上一位</button>
+            <button class="btn btn-primary" id="revealNextBtn" type="button">下一位</button>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button class="btn btn-ghost" id="revealCopyBtn" type="button">复制本轮名单</button>
+          <button class="btn btn-ghost" id="revealAllCopyBtn" type="button">复制本奖项全部名单</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+      ;(() => {
+      const $ = (sel, root = document) => root.querySelector(sel)
+      const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel))
+
+      const STORAGE_KEY = "lottery_v3_state"
+
+      const nowIso = () => new Date().toISOString()
+
+      const clamp = (v, min, max) => Math.max(min, Math.min(max, v))
+
+      const safeInt = (v, fallback) => {
+        const n = Number.parseInt(String(v || "").trim(), 10)
+        return Number.isFinite(n) ? n : fallback
+      }
+
+      const uniqueList = (arr) => {
+        const seen = new Set()
+        const out = []
+        for (const raw of arr) {
+          const s = String(raw || "").trim()
+          if (!s) continue
+          if (seen.has(s)) continue
+          seen.add(s)
+          out.push(s)
+        }
+        return out
+      }
+
+      const parseNames = (text) => {
+        const raw = String(text || "")
+          .replace(/\r/g, "\n")
+          .split(/[\n,，;；]+/g)
+          .map((s) => s.trim())
+          .filter(Boolean)
+        return uniqueList(raw)
+      }
+
+      const defaultPrizes = () => [
+        { id: "grand", name: "特等奖", total: 1, perDraw: 1, drawn: [] },
+        { id: "first", name: "一等奖", total: 2, perDraw: 1, drawn: [] },
+        { id: "second", name: "二等奖", total: 3, perDraw: 1, drawn: [] },
+        { id: "third", name: "三等奖", total: 5, perDraw: 1, drawn: [] },
+        { id: "lucky", name: "幸运奖", total: 10, perDraw: 2, drawn: [] },
+      ]
+
+      const seedFrom = () => {
+        const buf = new Uint32Array(3)
+        crypto.getRandomValues(buf)
+        return `${Date.now().toString(36)}-${buf[0].toString(36)}-${buf[1].toString(36)}-${buf[2].toString(36)}`
+      }
+
+      const secureRandInt = (maxExclusive) => {
+        const max = Number(maxExclusive) || 0
+        if (max <= 0) return 0
+        const u32 = new Uint32Array(1)
+        const limit = Math.floor(0xffffffff / max) * max
+        while (true) {
+          crypto.getRandomValues(u32)
+          const x = u32[0]
+          if (x < limit) return x % max
+        }
+      }
+
+      const pickWithoutReplacement = (pool, k) => {
+        const arr = pool.slice()
+        const picks = []
+        const n = clamp(k, 0, arr.length)
+        for (let i = 0; i < n; i++) {
+          const idx = secureRandInt(arr.length)
+          picks.push(arr.splice(idx, 1)[0])
+        }
+        return picks
+      }
+
+      const serializePrizes = (prizes) =>
+        prizes
+          .map((p) => `${p.name},${p.total},${p.perDraw}`)
+          .join("\n")
+
+      const parsePrizes = (text) => {
+        const lines = String(text || "")
+          .replace(/\r/g, "\n")
+          .split("\n")
+          .map((l) => l.trim())
+          .filter(Boolean)
+        const out = []
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i]
+          const parts = line.split(/[，,]/g).map((s) => s.trim()).filter(Boolean)
+          const name = parts[0] || `奖项${i + 1}`
+          const total = clamp(safeInt(parts[1], 0), 0, 999999)
+          const perDraw = clamp(safeInt(parts[2], 1), 1, 999999)
+          out.push({
+            id: `${name}-${i}-${Math.abs(hashStr(name + "|" + i))}`,
+            name,
+            total,
+            perDraw,
+            drawn: [],
+          })
+        }
+        return out.length ? out : defaultPrizes()
+      }
+
+      const hashStr = (s) => {
+        let h = 2166136261
+        for (let i = 0; i < s.length; i++) {
+          h ^= s.charCodeAt(i)
+          h = Math.imul(h, 16777619)
+        }
+        return h | 0
+      }
+
+      const defaultNames = () =>
+        [
+          "张三",
+          "李四",
+          "王五",
+          "赵六",
+          "钱七",
+          "孙八",
+          "周九",
+          "吴十",
+          "郑十一",
+          "王十二",
+          "陈十三",
+          "冯十四",
+          "褚十五",
+          "卫十六",
+          "蒋十七",
+          "沈十八",
+          "韩十九",
+          "杨二十",
+          "朱二一",
+          "秦二二",
+          "尤二三",
+          "许二四",
+          "何二五",
+          "吕二六",
+          "施二七",
+          "张二八",
+          "孔二九",
+          "曹三十",
+        ]
+
+      const createDefaultState = () => {
+        const master = defaultNames()
+        return {
+          company: "",
+          poolName: "默认名单",
+          seed: seedFrom(),
+          rolling: false,
+          rollingSpeedMs: 28,
+          layout: "auto",
+          settings: {
+            sound: true,
+            autoRemove: true,
+            autoAdvance: true,
+          },
+          masterCandidates: master,
+          poolCandidates: master.slice(),
+          prizes: defaultPrizes(),
+          currentPrizeIndex: 0,
+          history: [],
+          lastDraw: {
+            prizeId: "",
+            winners: [],
+          },
+        }
+      }
+
+      const loadState = () => {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY)
+          if (!raw) return createDefaultState()
+          const parsed = JSON.parse(raw)
+          const base = createDefaultState()
+          const merged = {
+            ...base,
+            ...parsed,
+            settings: { ...base.settings, ...(parsed.settings || {}) },
+          }
+          merged.masterCandidates = uniqueList(merged.masterCandidates || [])
+          merged.poolCandidates = uniqueList(merged.poolCandidates || [])
+          merged.prizes = Array.isArray(merged.prizes) ? merged.prizes : defaultPrizes()
+          merged.prizes = merged.prizes.map((p, idx) => ({
+            id: String(p.id || `${idx}`),
+            name: String(p.name || `奖项${idx + 1}`),
+            total: clamp(safeInt(p.total, 0), 0, 999999),
+            perDraw: clamp(safeInt(p.perDraw, 1), 1, 999999),
+            drawn: Array.isArray(p.drawn) ? uniqueList(p.drawn) : [],
+          }))
+          merged.currentPrizeIndex = clamp(safeInt(merged.currentPrizeIndex, 0), 0, Math.max(merged.prizes.length - 1, 0))
+          merged.history = Array.isArray(merged.history) ? merged.history : []
+          merged.history = merged.history
+            .map((h) => ({
+              id: String(h.id || `${Date.now()}-${Math.random()}`),
+              time: String(h.time || nowIso()),
+              prizeId: String(h.prizeId || ""),
+              prizeName: String(h.prizeName || ""),
+              winners: Array.isArray(h.winners) ? uniqueList(h.winners) : [],
+              seed: String(h.seed || merged.seed),
+            }))
+            .filter((h) => h.winners.length)
+          merged.lastDraw = merged.lastDraw && typeof merged.lastDraw === "object" ? merged.lastDraw : { prizeId: "", winners: [] }
+          merged.lastDraw.winners = Array.isArray(merged.lastDraw.winners) ? uniqueList(merged.lastDraw.winners) : []
+          if (!merged.poolCandidates.length && merged.masterCandidates.length) merged.poolCandidates = merged.masterCandidates.filter((n) => !allWinners(merged).includes(n))
+          if (!merged.poolCandidates.length && !merged.masterCandidates.length) merged.poolCandidates = []
+          return merged
+        } catch (e) {
+          return createDefaultState()
+        }
+      }
+
+      const saveState = () => {
+        const safe = {
+          company: state.company,
+          poolName: state.poolName,
+          seed: state.seed,
+          rollingSpeedMs: state.rollingSpeedMs,
+          layout: state.layout,
+          settings: state.settings,
+          masterCandidates: state.masterCandidates,
+          poolCandidates: state.poolCandidates,
+          prizes: state.prizes,
+          currentPrizeIndex: state.currentPrizeIndex,
+          history: state.history,
+          lastDraw: state.lastDraw,
+        }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(safe))
+      }
+
+      const allWinners = (st) => uniqueList((st.prizes || []).flatMap((p) => p.drawn || []))
+
+      const toastEl = $("#toast")
+      let toastTimer = null
+      const toast = (msg) => {
+        if (!toastEl) return
+        toastEl.textContent = msg
+        toastEl.classList.add("show")
+        if (toastTimer) clearTimeout(toastTimer)
+        toastTimer = setTimeout(() => toastEl.classList.remove("show"), 2200)
+      }
+
+      const confirmOverlay = $("#confirmOverlay")
+      const confirmTitle = $("#confirmTitle")
+      const confirmMessage = $("#confirmMessage")
+      const confirmOkBtn = $("#confirmOkBtn")
+      const confirmCancelBtn = $("#confirmCancelBtn")
+      const confirmCloseBtn = $("#confirmCloseBtn")
+      const confirmBackdrop = $("#confirmBackdrop")
+      let confirmResolve = null
+
+      const confirmAction = ({ title, message, okText, cancelText }) => {
+        return new Promise((resolve) => {
+          confirmResolve = resolve
+          confirmTitle.textContent = title || "确认"
+          confirmMessage.textContent = message || ""
+          confirmOkBtn.textContent = okText || "确定"
+          confirmCancelBtn.textContent = cancelText || "取消"
+          confirmOverlay.classList.add("open")
+        })
+      }
+
+      const closeConfirm = (val) => {
+        confirmOverlay.classList.remove("open")
+        const r = confirmResolve
+        confirmResolve = null
+        if (r) r(val)
+      }
+
+      confirmOkBtn.addEventListener("click", () => closeConfirm(true))
+      confirmCancelBtn.addEventListener("click", () => closeConfirm(false))
+      confirmCloseBtn.addEventListener("click", () => closeConfirm(false))
+      confirmBackdrop.addEventListener("click", () => closeConfirm(false))
+
+      const companyInput = $("#companyInput")
+      const speedInput = $("#speedInput")
+      const layoutAutoBtn = $("#layoutAutoBtn")
+      const layoutBigBtn = $("#layoutBigBtn")
+      const perDrawInput = $("#perDrawInput")
+
+      const heroTitle = $("#heroTitle")
+      const poolNameEl = $("#poolName")
+      const statusText = $("#statusText")
+      const countLeft = $("#countLeft")
+      const countWon = $("#countWon")
+      const prizeName = $("#prizeName")
+      const prizeProgress = $("#prizeProgress")
+      const stageDisplay = $("#stageDisplay")
+      const displayGrid = $("#displayGrid")
+      const stageText = $("#stageText")
+      const winnerList = $("#winnerList")
+      const fairnessText = $("#fairnessText")
+
+      const startStopBtn = $("#startStopBtn")
+      const nextPrizeBtn = $("#nextPrizeBtn")
+      const resetBtn = $("#resetBtn")
+      const openConsoleBtn = $("#openConsoleBtn")
+      const exportBtn = $("#exportBtn")
+      const rerollSeedBtn = $("#rerollSeedBtn")
+      const revealBtn = $("#revealBtn")
+
+      const soundBtn = $("#soundBtn")
+      const autoRemoveBtn = $("#autoRemoveBtn")
+      const autoAdvanceBtn = $("#autoAdvanceBtn")
+
+      const drawer = $("#consoleDrawer")
+      const drawerBackdrop = $("#consoleBackdrop")
+      const closeConsoleBtn = $("#closeConsoleBtn")
+      const cancelConsoleBtn = $("#cancelConsoleBtn")
+      const saveConsoleBtn = $("#saveConsoleBtn")
+
+      const tabs = $$(".tab", drawer)
+      const sections = ["tab-prize", "tab-names", "tab-settings", "tab-history"]
+
+      const prizeTextarea = $("#prizeTextarea")
+      const loadDefaultPrizeBtn = $("#loadDefaultPrizeBtn")
+      const namesTextarea = $("#namesTextarea")
+      const importBtn = $("#importBtn")
+      const dedupeBtn = $("#dedupeBtn")
+      const clearNamesBtn = $("#clearNamesBtn")
+      const fileInput = $("#fileInput")
+      const historyList = $("#historyList")
+      const clearHistoryBtn = $("#clearHistoryBtn")
+
+      const revealOverlay = $("#revealOverlay")
+      const revealBackdrop = $("#revealBackdrop")
+      const revealCloseBtn = $("#revealCloseBtn")
+      const revealText = $("#revealText")
+      const revealPrevBtn = $("#revealPrevBtn")
+      const revealNextBtn = $("#revealNextBtn")
+      const revealCopyBtn = $("#revealCopyBtn")
+      const revealAllCopyBtn = $("#revealAllCopyBtn")
+
+      let state = loadState()
+      let rafId = null
+      let rollingAccMs = 0
+      let lastTs = 0
+      let rollingPreview = []
+      let revealIndex = 0
+      let stageCount = 1
+      let refitTimer = null
+
+      const px = (v) => {
+        const n = Number.parseFloat(String(v || ""))
+        return Number.isFinite(n) ? n : 0
+      }
+
+      const innerWidth = (el) => {
+        if (!el) return 0
+        const cs = getComputedStyle(el)
+        return Math.max(0, el.clientWidth - px(cs.paddingLeft) - px(cs.paddingRight))
+      }
+
+      const fitNameSpan = (span, { minFontPx } = {}) => {
+        if (!span) return
+        const card = span.closest(".name-card")
+        if (!card) return
+
+        card.classList.remove("marquee")
+        card.style.removeProperty("--marquee-shift")
+        card.style.removeProperty("--marquee-dur")
+        span.style.fontSize = ""
+        span.style.letterSpacing = ""
+
+        const avail = innerWidth(card)
+        if (!avail) return
+
+        const computed = getComputedStyle(span)
+        const baseFont = px(computed.fontSize) || 48
+        const baseLetter = computed.letterSpacing === "normal" ? 0 : px(computed.letterSpacing)
+        const minFont = Number.isFinite(minFontPx) ? minFontPx : stageCount <= 1 ? 26 : 16
+
+        const needed0 = span.scrollWidth
+        if (!needed0 || needed0 <= avail + 1) return
+
+        const ratio0 = clamp(avail / needed0, 0.08, 1)
+        const target = clamp(baseFont * ratio0, minFont, baseFont)
+        span.style.fontSize = `${target}px`
+        if (baseLetter) span.style.letterSpacing = `${Math.max(0, baseLetter * Math.pow(ratio0, 1.18))}px`
+
+        const needed1 = span.scrollWidth
+        if (needed1 > avail + 1 && target <= minFont + 0.5) {
+          const shift = Math.max(0, needed1 - avail)
+          card.classList.add("marquee")
+          card.style.setProperty("--marquee-shift", `${shift}px`)
+          card.style.setProperty("--marquee-dur", `${clamp(shift / 38 + 6, 8, 18)}s`)
+        }
+      }
+
+      const refitStageTexts = () => {
+        const stageSpans = $$(".name-text", displayGrid)
+        for (const s of stageSpans) fitNameSpan(s)
+        if (revealOverlay.classList.contains("open")) fitNameSpan(revealText, { minFontPx: 24 })
+      }
+
+      const scheduleRefit = () => {
+        if (refitTimer) cancelAnimationFrame(refitTimer)
+        refitTimer = requestAnimationFrame(refitStageTexts)
+      }
+
+      const updateHero = () => {
+        const c = String(state.company || "").trim()
+        heroTitle.textContent = c ? `${c} 年会点名抽奖` : "新春年会点名抽奖"
+      }
+
+      const prizeAt = (idx) => state.prizes[clamp(idx, 0, Math.max(state.prizes.length - 1, 0))]
+      const currentPrize = () => prizeAt(state.currentPrizeIndex)
+
+      const prizeRemaining = (p) => {
+        const total = Number(p.total) || 0
+        if (total <= 0) return Infinity
+        return Math.max(0, total - (p.drawn || []).length)
+      }
+
+      const normalizePool = () => {
+        const winners = new Set(allWinners(state))
+        state.masterCandidates = uniqueList(state.masterCandidates)
+        if (state.settings.autoRemove) state.poolCandidates = state.masterCandidates.filter((n) => !winners.has(n))
+        state.poolCandidates = uniqueList(state.poolCandidates)
+      }
+
+      const fairnessLabel = () => {
+        const p = currentPrize()
+        const base = `${state.seed} · ${p ? p.name : "—"}`
+        return base.length > 52 ? base.slice(0, 52) + "…" : base
+      }
+
+      const setRollingUi = (isRolling) => {
+        state.rolling = isRolling
+        startStopBtn.textContent = isRolling ? "停止" : "开始"
+        statusText.textContent = isRolling ? "抽取中" : "待机"
+        if (isRolling) stageDisplay.classList.add("rolling")
+        else stageDisplay.classList.remove("rolling")
+      }
+
+      const renderCounts = () => {
+        normalizePool()
+        countLeft.textContent = String(state.poolCandidates.length)
+        countWon.textContent = String(allWinners(state).length)
+        poolNameEl.textContent = state.poolName || "默认名单"
+      }
+
+      const renderPrize = () => {
+        const p = currentPrize()
+        if (!p) {
+          prizeName.textContent = "—"
+          prizeProgress.textContent = "0/0"
+          perDrawInput.value = "1"
+          return
+        }
+        prizeName.textContent = p.name
+        const total = Number(p.total) || 0
+        const drawn = (p.drawn || []).length
+        prizeProgress.textContent = total > 0 ? `${drawn}/${total}` : `${drawn}/∞`
+        perDrawInput.value = String(clamp(safeInt(perDrawInput.value, p.perDraw), 1, 999999))
+      }
+
+      const gridClassFor = (n) => {
+        const forceBig = state.layout === "big"
+        if (forceBig) return ""
+        if (n <= 1) return ""
+        if (n <= 2) return "grid-2"
+        if (n <= 6) return "grid-3"
+        return "grid-4"
+      }
+
+      const renderStage = (names, { asWinner } = {}) => {
+        const list = Array.isArray(names) ? names : [String(names || "")]
+        stageCount = list.length
+        stageDisplay.classList.toggle("mode-multi", list.length > 1)
+        stageDisplay.classList.toggle("mode-single", list.length <= 1)
+        displayGrid.className = `display-grid ${gridClassFor(list.length)} ${list.length === 1 ? "single" : ""}`.trim()
+        displayGrid.innerHTML = ""
+        const maxShow = Math.min(list.length, 12)
+        for (let i = 0; i < maxShow; i++) {
+          const name = list[i]
+          const card = document.createElement("div")
+          card.className = "name-card"
+          const span = document.createElement("span")
+          span.className = "name-text"
+          span.textContent = name || "—"
+          card.appendChild(span)
+          if (asWinner) card.classList.add("winner-pop")
+          displayGrid.appendChild(card)
+        }
+        if (list.length > maxShow) {
+          const extra = document.createElement("div")
+          extra.className = "row"
+          extra.innerHTML = `<div><strong>还有 ${list.length - maxShow} 位</strong><div class="muted" style="font-weight:800;letter-spacing:.08em">已省略展示</div></div><div class="muted" style="font-weight:900;letter-spacing:.14em">…</div>`
+          extra.style.width = "100%"
+          displayGrid.appendChild(extra)
+        }
+        scheduleRefit()
+      }
+
+      const renderWinners = () => {
+        const rows = []
+        for (let i = state.prizes.length - 1; i >= 0; i--) {
+          const p = state.prizes[i]
+          const winners = Array.isArray(p.drawn) ? p.drawn : []
+          if (!winners.length) continue
+          const head = `<div class="row"><div><strong>${p.name}</strong><div class="muted" style="font-weight:800;letter-spacing:.08em">共 ${winners.length} 位</div></div><button class="btn btn-ghost mini" data-copy="${p.id}" type="button">复制</button></div>`
+          rows.push(head)
+          for (let k = winners.length - 1; k >= 0; k--) {
+            const w = winners[k]
+            rows.push(`<div class="row"><div style="font-weight:900;letter-spacing:.08em">${w}</div><div class="muted" style="font-weight:900;letter-spacing:.14em">${String(k + 1).padStart(2, "0")}</div></div>`)
+          }
+        }
+        winnerList.innerHTML = rows.length ? rows.join("") : `<div class="row"><div><strong>还没有中奖记录</strong><div class="muted" style="font-weight:800;letter-spacing:.08em">点击开始，现场一起嗨起来</div></div><div class="muted" style="font-weight:900;letter-spacing:.14em">🏮</div></div>`
+        $$("[data-copy]", winnerList).forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const id = btn.getAttribute("data-copy")
+            const p = state.prizes.find((x) => String(x.id) === String(id))
+            const list = p && Array.isArray(p.drawn) ? p.drawn : []
+            copyText(list.join("\n"))
+            toast(`已复制：${p ? p.name : "名单"}（${list.length}）`)
+          })
+        })
+      }
+
+      const renderHistory = () => {
+        const items = [...state.history].slice().reverse()
+        if (!items.length) {
+          historyList.innerHTML = `<div class="row"><div><strong>暂无记录</strong><div class="muted" style="font-weight:800;letter-spacing:.08em">每次开奖都会自动记录</div></div><div class="muted" style="font-weight:900;letter-spacing:.14em">🧧</div></div>`
+          return
+        }
+        historyList.innerHTML = items
+          .map((h) => {
+            const t = new Date(h.time).toLocaleString()
+            const ws = (h.winners || []).join("、")
+            return `<div class="row"><div><strong>${h.prizeName}</strong><div class="muted" style="font-weight:800;letter-spacing:.08em">${t}</div><div style="font-weight:900;letter-spacing:.06em;opacity:.92">${ws}</div></div><button class="btn btn-ghost mini" data-reveal="${h.id}" type="button">点名</button></div>`
+          })
+          .join("")
+        $$("[data-reveal]", historyList).forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const id = btn.getAttribute("data-reveal")
+            const h = state.history.find((x) => String(x.id) === String(id))
+            if (!h) return
+            state.lastDraw = { prizeId: h.prizeId, winners: uniqueList(h.winners || []) }
+            saveState()
+            openReveal()
+          })
+        })
+      }
+
+      const renderSettings = () => {
+        updateHero()
+        companyInput.value = String(state.company || "")
+        speedInput.value = String(clamp(safeInt(state.rollingSpeedMs, 28), 8, 160))
+        soundBtn.textContent = state.settings.sound ? "音效：开" : "音效：关"
+        autoRemoveBtn.textContent = state.settings.autoRemove ? "去重：开" : "去重：关"
+        autoAdvanceBtn.textContent = state.settings.autoAdvance ? "自动切换：开" : "自动切换：关"
+        fairnessText.textContent = fairnessLabel()
+      }
+
+      const renderAll = () => {
+        renderCounts()
+        renderPrize()
+        renderWinners()
+        renderHistory()
+        renderSettings()
+      }
+
+      const openDrawer = () => {
+        prizeTextarea.value = serializePrizes(state.prizes)
+        namesTextarea.value = state.masterCandidates.join("\n")
+        drawer.classList.add("open")
+        setTab("tab-prize")
+      }
+
+      const closeDrawer = () => drawer.classList.remove("open")
+
+      const setTab = (id) => {
+        tabs.forEach((t) => t.classList.toggle("active", t.getAttribute("data-tab") === id))
+        sections.forEach((sid) => {
+          const el = $("#" + sid)
+          if (!el) return
+          el.classList.toggle("hidden", sid !== id)
+        })
+      }
+
+      tabs.forEach((t) => t.addEventListener("click", () => setTab(t.getAttribute("data-tab"))))
+      openConsoleBtn.addEventListener("click", openDrawer)
+      closeConsoleBtn.addEventListener("click", closeDrawer)
+      cancelConsoleBtn.addEventListener("click", closeDrawer)
+      drawerBackdrop.addEventListener("click", closeDrawer)
+
+      const applyConsoleChanges = async () => {
+        const newPrizes = parsePrizes(prizeTextarea.value)
+        const incomingNames = parseNames(namesTextarea.value)
+        const changingNames = JSON.stringify(incomingNames) !== JSON.stringify(state.masterCandidates)
+        const changingPrizes = JSON.stringify(newPrizes.map((p) => ({ name: p.name, total: p.total, perDraw: p.perDraw }))) !== JSON.stringify(state.prizes.map((p) => ({ name: p.name, total: p.total, perDraw: p.perDraw })))
+
+        if (changingNames) {
+          const reset = await confirmAction({
+            title: "名单已修改",
+            message: "是否立即重置奖池（清空所有中奖记录）？选择取消：保留中奖人员，仅更新剩余奖池。",
+            okText: "重置",
+            cancelText: "保留",
+          })
+          state.masterCandidates = incomingNames
+          if (reset) {
+            state.prizes = state.prizes.map((p) => ({ ...p, drawn: [] }))
+            state.history = []
+            state.poolCandidates = incomingNames.slice()
+          } else {
+            state.poolCandidates = incomingNames.slice()
+          }
+        }
+
+        if (changingPrizes) {
+          const keep = await confirmAction({
+            title: "奖项已修改",
+            message: "是否保留已中奖记录并尝试映射到同名奖项？选择取消将清空中奖记录。",
+            okText: "保留",
+            cancelText: "清空",
+          })
+          if (keep) {
+            const oldByName = new Map(state.prizes.map((p) => [p.name, p]))
+            state.prizes = newPrizes.map((p) => {
+              const old = oldByName.get(p.name)
+              const drawn = old && Array.isArray(old.drawn) ? uniqueList(old.drawn) : []
+              return { ...p, drawn }
+            })
+          } else {
+            state.prizes = newPrizes.map((p) => ({ ...p, drawn: [] }))
+            state.history = []
+          }
+          state.currentPrizeIndex = clamp(state.currentPrizeIndex, 0, Math.max(state.prizes.length - 1, 0))
+        }
+
+        state.company = String(companyInput.value || "").trim()
+        state.rollingSpeedMs = clamp(safeInt(speedInput.value, state.rollingSpeedMs), 8, 160)
+        saveState()
+        renderAll()
+        toast("已保存")
+        closeDrawer()
+      }
+
+      saveConsoleBtn.addEventListener("click", () => applyConsoleChanges())
+
+      loadDefaultPrizeBtn.addEventListener("click", () => {
+        prizeTextarea.value = serializePrizes(defaultPrizes())
+        toast("已恢复默认奖项")
+      })
+
+      dedupeBtn.addEventListener("click", () => {
+        namesTextarea.value = parseNames(namesTextarea.value).join("\n")
+        toast("已去重")
+      })
+
+      clearNamesBtn.addEventListener("click", async () => {
+        const ok = await confirmAction({
+          title: "清空名单",
+          message: "将清空输入框内容，不会立刻影响当前抽奖，保存后生效。",
+          okText: "清空",
+          cancelText: "取消",
+        })
+        if (!ok) return
+        namesTextarea.value = ""
+      })
+
+      importBtn.addEventListener("click", () => fileInput.click())
+      fileInput.addEventListener("change", async (e) => {
+        const file = e.target.files && e.target.files[0]
+        if (!file) return
+        const text = await file.text()
+        const merged = parseNames(namesTextarea.value + "\n" + text)
+        namesTextarea.value = merged.join("\n")
+        fileInput.value = ""
+        toast(`已导入：${file.name}`)
+      })
+
+      clearHistoryBtn.addEventListener("click", async () => {
+        const ok = await confirmAction({
+          title: "清空抽奖记录",
+          message: "将清空记录与中奖名单，并重置奖池。",
+          okText: "清空",
+          cancelText: "取消",
+        })
+        if (!ok) return
+        state.prizes = state.prizes.map((p) => ({ ...p, drawn: [] }))
+        state.history = []
+        state.poolCandidates = state.masterCandidates.slice()
+        state.currentPrizeIndex = 0
+        state.lastDraw = { prizeId: "", winners: [] }
+        saveState()
+        renderAll()
+        toast("已清空")
+      })
+
+      const setFlag = (key, val) => {
+        state.settings[key] = !!val
+        saveState()
+        renderSettings()
+      }
+
+      soundBtn.addEventListener("click", () => setFlag("sound", !state.settings.sound))
+      autoRemoveBtn.addEventListener("click", () => {
+        state.settings.autoRemove = !state.settings.autoRemove
+        normalizePool()
+        saveState()
+        renderAll()
+      })
+      autoAdvanceBtn.addEventListener("click", () => setFlag("autoAdvance", !state.settings.autoAdvance))
+
+      const audio = (() => {
+        let ctx = null
+        const ensure = () => {
+          if (ctx) return ctx
+          ctx = new (window.AudioContext || window.webkitAudioContext)()
+          return ctx
+        }
+        const tone = (freq, t, gain, type) => {
+          const c = ensure()
+          const o = c.createOscillator()
+          const g = c.createGain()
+          o.type = type || "sine"
+          o.frequency.setValueAtTime(freq, c.currentTime)
+          g.gain.setValueAtTime(0.0001, c.currentTime)
+          g.gain.exponentialRampToValueAtTime(gain, c.currentTime + 0.01)
+          g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + t)
+          o.connect(g)
+          g.connect(c.destination)
+          o.start()
+          o.stop(c.currentTime + t + 0.02)
+        }
+        const noiseHit = (t, gain) => {
+          const c = ensure()
+          const bufferSize = Math.floor(c.sampleRate * t)
+          const buffer = c.createBuffer(1, bufferSize, c.sampleRate)
+          const data = buffer.getChannelData(0)
+          for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 1.4)
+          const src = c.createBufferSource()
+          src.buffer = buffer
+          const g = c.createGain()
+          g.gain.setValueAtTime(gain, c.currentTime)
+          const f = c.createBiquadFilter()
+          f.type = "lowpass"
+          f.frequency.setValueAtTime(1600, c.currentTime)
+          src.connect(f)
+          f.connect(g)
+          g.connect(c.destination)
+          src.start()
+          src.stop(c.currentTime + t)
+        }
+        const click = () => {
+          if (!state.settings.sound) return
+          tone(660, 0.05, 0.06, "triangle")
+          tone(330, 0.06, 0.04, "sine")
+        }
+        const start = () => {
+          if (!state.settings.sound) return
+          tone(220, 0.08, 0.06, "sine")
+          tone(440, 0.08, 0.03, "triangle")
+        }
+        const stop = () => {
+          if (!state.settings.sound) return
+          noiseHit(0.16, 0.06)
+          tone(196, 0.12, 0.08, "sine")
+          tone(294, 0.12, 0.06, "triangle")
+        }
+        const win = () => {
+          if (!state.settings.sound) return
+          tone(523.25, 0.13, 0.06, "triangle")
+          tone(659.25, 0.13, 0.05, "triangle")
+          tone(783.99, 0.16, 0.05, "triangle")
+          noiseHit(0.12, 0.035)
+        }
+        return { click, start, stop, win }
+      })()
+
+      const confettiBurst = () => {
+        if (typeof window.confetti !== "function") return
+        const colors = ["#ffd700", "#ffae00", "#ff2d2d", "#ffffff"]
+        const base = {
+          spread: 75,
+          ticks: 160,
+          gravity: 0.9,
+          decay: 0.93,
+          scalar: 1.05,
+          colors,
+        }
+        window.confetti({ ...base, particleCount: 120, origin: { x: 0.5, y: 0.62 } })
+        window.confetti({ ...base, particleCount: 60, angle: 60, origin: { x: 0.1, y: 0.7 } })
+        window.confetti({ ...base, particleCount: 60, angle: 120, origin: { x: 0.9, y: 0.7 } })
+      }
+
+      const copyText = async (text) => {
+        try {
+          await navigator.clipboard.writeText(String(text || ""))
+          return true
+        } catch (e) {
+          const ta = document.createElement("textarea")
+          ta.value = String(text || "")
+          document.body.appendChild(ta)
+          ta.select()
+          document.execCommand("copy")
+          document.body.removeChild(ta)
+          return true
+        }
+      }
+
+      const exportData = () => {
+        const rows = []
+        for (const h of state.history) {
+          const t = new Date(h.time).toLocaleString()
+          for (const w of h.winners || []) rows.push([t, h.prizeName, w, h.seed].join(","))
+        }
+        const csv = ["时间,奖项,姓名,种子"].concat(rows).join("\n")
+        downloadBlob(csv, "text/csv;charset=utf-8", `年会抽奖-中奖记录-${new Date().toISOString().slice(0, 10)}.csv`)
+        downloadBlob(JSON.stringify(state, null, 2), "application/json;charset=utf-8", `年会抽奖-完整数据-${new Date().toISOString().slice(0, 10)}.json`)
+        toast("已导出 CSV + JSON")
+      }
+
+      const downloadBlob = (content, type, fileName) => {
+        const blob = new Blob([content], { type })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = fileName
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+      }
+
+      exportBtn.addEventListener("click", exportData)
+
+      const gotoNextPrize = () => {
+        if (!state.prizes.length) return
+        const start = state.currentPrizeIndex
+        for (let step = 1; step <= state.prizes.length; step++) {
+          const idx = (start + step) % state.prizes.length
+          const p = prizeAt(idx)
+          if (prizeRemaining(p) > 0) {
+            state.currentPrizeIndex = idx
+            saveState()
+            renderAll()
+            toast(`切换：${p.name}`)
+            return
+          }
+        }
+        toast("所有奖项已抽完")
+      }
+
+      nextPrizeBtn.addEventListener("click", gotoNextPrize)
+
+      rerollSeedBtn.addEventListener("click", () => {
+        state.seed = seedFrom()
+        saveState()
+        renderSettings()
+        toast("已更新随机种子")
+      })
+
+      const resetAll = async () => {
+        const ok = await confirmAction({
+          title: "重置抽奖",
+          message: "将清空中奖记录并恢复奖池。",
+          okText: "重置",
+          cancelText: "取消",
+        })
+        if (!ok) return
+        state.prizes = state.prizes.map((p) => ({ ...p, drawn: [] }))
+        state.history = []
+        state.poolCandidates = state.masterCandidates.slice()
+        state.currentPrizeIndex = 0
+        state.lastDraw = { prizeId: "", winners: [] }
+        state.seed = seedFrom()
+        setRollingUi(false)
+        stopRollingLoop()
+        saveState()
+        renderAll()
+        renderStage(["准备开始"])
+        toast("已重置")
+      }
+
+      resetBtn.addEventListener("click", resetAll)
+
+      const eligiblePerDraw = () => {
+        const p = currentPrize()
+        if (!p) return 1
+        const user = clamp(safeInt(perDrawInput.value, p.perDraw), 1, 999999)
+        const remainingPrize = prizeRemaining(p)
+        const capByPrize = remainingPrize === Infinity ? user : Math.min(user, remainingPrize)
+        return Math.min(capByPrize, state.poolCandidates.length || 0) || 0
+      }
+
+      const ensurePrizeReady = () => {
+        if (!state.prizes.length) state.prizes = defaultPrizes()
+        if (state.currentPrizeIndex >= state.prizes.length) state.currentPrizeIndex = 0
+      }
+
+      const startRollingLoop = () => {
+        stopRollingLoop()
+        lastTs = 0
+        rollingAccMs = 0
+        rafId = requestAnimationFrame(tick)
+      }
+
+      const stopRollingLoop = () => {
+        if (rafId) cancelAnimationFrame(rafId)
+        rafId = null
+      }
+
+      const samplePreview = () => {
+        const n = eligiblePerDraw()
+        if (!n) return ["奖池已空"]
+        const pool = state.poolCandidates
+        if (n === 1) return [pool[secureRandInt(pool.length)]]
+        const picks = []
+        const used = new Set()
+        while (picks.length < n && used.size < pool.length) {
+          const name = pool[secureRandInt(pool.length)]
+          if (used.has(name)) continue
+          used.add(name)
+          picks.push(name)
+        }
+        return picks.length ? picks : ["—"]
+      }
+
+      const tick = (ts) => {
+        if (!state.rolling) return
+        if (!lastTs) lastTs = ts
+        const dt = ts - lastTs
+        lastTs = ts
+        rollingAccMs += dt
+        const step = clamp(safeInt(state.rollingSpeedMs, 28), 8, 160)
+        if (rollingAccMs >= step) {
+          rollingAccMs = rollingAccMs % step
+          rollingPreview = samplePreview()
+          renderStage(rollingPreview)
+        }
+        rafId = requestAnimationFrame(tick)
+      }
+
+      const finalizeDraw = () => {
+        ensurePrizeReady()
+        normalizePool()
+        const p = currentPrize()
+        const count = eligiblePerDraw()
+        if (!p) {
+          toast("没有奖项")
+          return
+        }
+        if (!count) {
+          toast("奖池已空或奖项已抽完")
+          return
+        }
+        const picks = pickWithoutReplacement(state.poolCandidates, count)
+        const prizeDoneBefore = prizeRemaining(p) === 0
+        const drawn = uniqueList([...(p.drawn || []), ...picks])
+        p.drawn = drawn
+        if (state.settings.autoRemove) {
+          const pickedSet = new Set(picks)
+          state.poolCandidates = state.poolCandidates.filter((n) => !pickedSet.has(n))
+        }
+        state.lastDraw = { prizeId: p.id, winners: picks }
+        state.history.push({
+          id: `${Date.now()}-${Math.abs(hashStr(p.name + state.seed))}-${secureRandInt(999999)}`,
+          time: nowIso(),
+          prizeId: p.id,
+          prizeName: p.name,
+          winners: picks,
+          seed: state.seed,
+        })
+        state.seed = seedFrom()
+        if (!prizeDoneBefore && state.settings.autoAdvance && prizeRemaining(p) === 0) {
+          gotoNextPrize()
+        }
+        saveState()
+        renderAll()
+        renderStage(picks, { asWinner: true })
+        confettiBurst()
+        fireworksBurst()
+        audio.win()
+        toast(`恭喜：${p.name} · ${picks.length} 位`)
+      }
+
+      const startStop = () => {
+        normalizePool()
+        ensurePrizeReady()
+        if (state.rolling) {
+          audio.stop()
+          setRollingUi(false)
+          stopRollingLoop()
+          finalizeDraw()
+          return
+        }
+        if (!state.poolCandidates.length) {
+          toast("奖池已空，请在控制台导入名单或重置")
+          return
+        }
+        const p = currentPrize()
+        if (p && prizeRemaining(p) === 0) {
+          toast("当前奖项已抽完，切换到下一奖项")
+          gotoNextPrize()
+        }
+        audio.start()
+        setRollingUi(true)
+        startRollingLoop()
+        toast("抽取中…")
+      }
+
+      startStopBtn.addEventListener("click", startStop)
+
+      const openReveal = () => {
+        const winners = uniqueList((state.lastDraw && state.lastDraw.winners) || [])
+        if (!winners.length) {
+          toast("暂无本轮名单")
+          return
+        }
+        revealIndex = 0
+        revealText.textContent = winners[0] || "—"
+        revealOverlay.classList.add("open")
+        scheduleRefit()
+        audio.click()
+      }
+
+      const closeReveal = () => revealOverlay.classList.remove("open")
+
+      const revealWinners = () => uniqueList((state.lastDraw && state.lastDraw.winners) || [])
+      const revealPrizeWinners = () => {
+        const prizeId = state.lastDraw && state.lastDraw.prizeId
+        const p = state.prizes.find((x) => String(x.id) === String(prizeId))
+        return uniqueList((p && p.drawn) || [])
+      }
+
+      const setRevealIndex = (next) => {
+        const list = revealWinners()
+        if (!list.length) return
+        revealIndex = clamp(next, 0, list.length - 1)
+        revealText.textContent = list[revealIndex] || "—"
+        scheduleRefit()
+        audio.click()
+      }
+
+      revealBtn.addEventListener("click", openReveal)
+      revealCloseBtn.addEventListener("click", closeReveal)
+      revealBackdrop.addEventListener("click", closeReveal)
+      revealPrevBtn.addEventListener("click", () => setRevealIndex(revealIndex - 1))
+      revealNextBtn.addEventListener("click", () => setRevealIndex(revealIndex + 1))
+      revealCopyBtn.addEventListener("click", async () => {
+        const ok = await copyText(revealWinners().join("\n"))
+        if (ok) toast("已复制本轮名单")
+      })
+      revealAllCopyBtn.addEventListener("click", async () => {
+        const ok = await copyText(revealPrizeWinners().join("\n"))
+        if (ok) toast("已复制本奖项全部名单")
+      })
+
+      const keyHandler = (e) => {
+        if (confirmOverlay.classList.contains("open")) return
+        if (e.key === "Escape") {
+          if (drawer.classList.contains("open")) closeDrawer()
+          if (revealOverlay.classList.contains("open")) closeReveal()
+          return
+        }
+        if (e.key === "c" || e.key === "C") {
+          if (!drawer.classList.contains("open")) openDrawer()
+          else closeDrawer()
+          return
+        }
+        if (e.key === " " || e.code === "Space") {
+          e.preventDefault()
+          startStop()
+          return
+        }
+        if (e.key === "Enter") {
+          if (state.rolling) {
+            e.preventDefault()
+            startStop()
+          }
+          return
+        }
+        if (e.key === "r" || e.key === "R") {
+          resetAll()
+          return
+        }
+        if (e.key === "n" || e.key === "N") {
+          if (revealOverlay.classList.contains("open")) setRevealIndex(revealIndex + 1)
+        }
+      }
+
+      window.addEventListener("keydown", keyHandler, { passive: false })
+
+      const updateLayoutButtons = () => {
+        const auto = state.layout === "auto"
+        layoutAutoBtn.classList.toggle("btn-primary", auto)
+        layoutAutoBtn.classList.toggle("btn-ghost", !auto)
+        layoutBigBtn.classList.toggle("btn-primary", !auto)
+        layoutBigBtn.classList.toggle("btn-ghost", auto)
+      }
+
+      layoutAutoBtn.addEventListener("click", () => {
+        state.layout = "auto"
+        saveState()
+        updateLayoutButtons()
+        toast("布局：自动")
+      })
+
+      layoutBigBtn.addEventListener("click", () => {
+        state.layout = "big"
+        saveState()
+        updateLayoutButtons()
+        toast("布局：大屏")
+      })
+
+      const fireworks = (() => {
+        const c = $("#fx-fireworks")
+        const ctx = c.getContext("2d")
+        let w = 0
+        let h = 0
+        const particles = []
+        const resize = () => {
+          w = c.width = Math.floor(window.innerWidth * devicePixelRatio)
+          h = c.height = Math.floor(window.innerHeight * devicePixelRatio)
+        }
+        const rand = (a, b) => a + Math.random() * (b - a)
+        const spawn = (x, y, color) => {
+          const count = Math.floor(rand(46, 78))
+          for (let i = 0; i < count; i++) {
+            const ang = rand(0, Math.PI * 2)
+            const sp = rand(2.2, 6.8) * devicePixelRatio
+            particles.push({
+              x: x * devicePixelRatio,
+              y: y * devicePixelRatio,
+              vx: Math.cos(ang) * sp,
+              vy: Math.sin(ang) * sp,
+              life: rand(780, 1120),
+              age: 0,
+              color,
+            })
+          }
+        }
+        const step = (dt) => {
+          ctx.clearRect(0, 0, w, h)
+          ctx.globalCompositeOperation = "lighter"
+          for (let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i]
+            p.age += dt
+            const t = p.age / p.life
+            if (t >= 1) {
+              particles.splice(i, 1)
+              continue
+            }
+            p.vy += 0.012 * devicePixelRatio * dt
+            p.x += p.vx * (dt / 16)
+            p.y += p.vy * (dt / 16)
+            const a = Math.pow(1 - t, 1.6)
+            ctx.fillStyle = `rgba(${p.color.r},${p.color.g},${p.color.b},${0.9 * a})`
+            ctx.beginPath()
+            ctx.arc(p.x, p.y, (2.1 + 2.4 * (1 - t)) * devicePixelRatio, 0, Math.PI * 2)
+            ctx.fill()
+          }
+          ctx.globalCompositeOperation = "source-over"
+        }
+        let last = 0
+        const loop = (ts) => {
+          if (!last) last = ts
+          const dt = ts - last
+          last = ts
+          if (particles.length) step(dt)
+          requestAnimationFrame(loop)
+        }
+        resize()
+        requestAnimationFrame(loop)
+        window.addEventListener("resize", resize)
+        const burst = () => {
+          const palette = [
+            { r: 255, g: 215, b: 0 },
+            { r: 255, g: 174, b: 0 },
+            { r: 255, g: 60, b: 60 },
+            { r: 255, g: 255, b: 255 },
+          ]
+          const p = palette[secureRandInt(palette.length)]
+          spawn(rand(0.28, 0.72) * window.innerWidth, rand(0.18, 0.52) * window.innerHeight, p)
+          spawn(rand(0.22, 0.78) * window.innerWidth, rand(0.14, 0.56) * window.innerHeight, palette[secureRandInt(palette.length)])
+        }
+        return { burst }
+      })()
+
+      const fireworksBurst = () => fireworks.burst()
+
+      const bg = (() => {
+        const c = $("#fx-bg")
+        const ctx = c.getContext("2d")
+        let w = 0
+        let h = 0
+        const stars = []
+        const resize = () => {
+          w = c.width = Math.floor(window.innerWidth * devicePixelRatio)
+          h = c.height = Math.floor(window.innerHeight * devicePixelRatio)
+          stars.length = 0
+          const count = Math.floor(Math.min(160, Math.max(70, (window.innerWidth * window.innerHeight) / 16000)))
+          for (let i = 0; i < count; i++) {
+            stars.push({
+              x: Math.random() * w,
+              y: Math.random() * h,
+              r: (0.5 + Math.random() * 1.9) * devicePixelRatio,
+              a: 0.3 + Math.random() * 0.5,
+              s: (0.4 + Math.random() * 1.4) * devicePixelRatio,
+            })
+          }
+        }
+        const step = () => {
+          ctx.clearRect(0, 0, w, h)
+          ctx.globalCompositeOperation = "lighter"
+          for (const s of stars) {
+            s.y += s.s * 0.06
+            if (s.y > h + 20) s.y = -20
+            const tw = 0.6 + 0.4 * Math.sin((s.x + s.y) * 0.002)
+            ctx.fillStyle = `rgba(255,217,138,${s.a * tw})`
+            ctx.beginPath()
+            ctx.arc(s.x, s.y, s.r * tw, 0, Math.PI * 2)
+            ctx.fill()
+          }
+          ctx.globalCompositeOperation = "source-over"
+          requestAnimationFrame(step)
+        }
+        resize()
+        requestAnimationFrame(step)
+        window.addEventListener("resize", resize)
+      })()
+
+      const init = () => {
+        updateLayoutButtons()
+        renderAll()
+        renderStage(["准备开始"])
+        if (state.rolling) {
+          setRollingUi(false)
+          stopRollingLoop()
+          state.rolling = false
+          saveState()
+        }
+        toast("已就绪")
+      }
+
+      const syncSettingsInputs = () => {
+        companyInput.value = String(state.company || "")
+        speedInput.value = String(clamp(safeInt(state.rollingSpeedMs, 28), 8, 160))
+      }
+
+      companyInput.addEventListener("input", () => {
+        state.company = String(companyInput.value || "").trim()
+        saveState()
+        updateHero()
+      })
+
+      speedInput.addEventListener("input", () => {
+        state.rollingSpeedMs = clamp(safeInt(speedInput.value, state.rollingSpeedMs), 8, 160)
+        saveState()
+      })
+
+      perDrawInput.addEventListener("input", () => {
+        perDrawInput.value = String(clamp(safeInt(perDrawInput.value, 1), 1, 999999))
+      })
+
+      revealOverlay.addEventListener("keydown", (e) => e.stopPropagation())
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden && state.rolling) {
+          setRollingUi(false)
+          stopRollingLoop()
+          saveState()
+          toast("已暂停")
+        }
+      })
+
+      window.addEventListener("resize", scheduleRefit)
+      if (document.fonts && document.fonts.ready && typeof document.fonts.ready.then === "function") {
+        document.fonts.ready.then(() => scheduleRefit())
+      }
+
+      init()
+      syncSettingsInputs()
+      })()
+    </script>
+  </body>
+</html>
