@@ -3,25 +3,19 @@ function clamp(value, min, max) {
 }
 
 function setViewportVars() {
-  const dpr = window.devicePixelRatio || 1
-
   const viewportWidth = window.visualViewport?.width ?? window.innerWidth
   const viewportHeight = window.visualViewport?.height ?? window.innerHeight
 
-  const physicalWidth = viewportWidth * dpr
-  const physicalHeight = viewportHeight * dpr
-
-  const basePhysicalWidth = 3024
-  const basePhysicalHeight = 1964
+  const baseViewportWidth = 2470.5
+  const baseViewportHeight = 1516.5
 
   const uiScale = clamp(
-    Math.min(physicalWidth / basePhysicalWidth, physicalHeight / basePhysicalHeight),
-    0.75,
+    Math.min(viewportWidth / baseViewportWidth, viewportHeight / baseViewportHeight),
+    0.6,
     1.6,
   )
 
   const rootStyle = document.documentElement.style
-  rootStyle.setProperty('--dpr', String(dpr))
   rootStyle.setProperty('--ui-scale', String(uiScale))
 }
 
