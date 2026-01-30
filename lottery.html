@@ -17,8 +17,13 @@
             --gold: #ffd700;
             --gold-light: #ffae00;
             --dpr: 1;
+            --ui-scale: 1;
             --pvw: calc(1vw * var(--dpr));
             --pvh: calc(1vh * var(--dpr));
+        }
+
+        html {
+            font-size: calc(16px * var(--ui-scale));
         }
 
         body {
